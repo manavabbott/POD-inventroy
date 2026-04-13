@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +6,7 @@
 <title>POD Inventory</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 <style>
 :root {
   --bg:#0f1117;--bg2:#161820;--bg3:#1e2029;--bg4:#252730;
@@ -98,7 +98,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 /* STATS */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;position:relative;overflow:hidden;}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;position:relative;overflow:hidden;transition:transform 0.12s, border-color 0.12s;}
+.stat-card.clickable{cursor:pointer;}
+.stat-card.clickable:hover{transform:translateY(-2px);border-color:var(--border2);}
+.stat-card.clickable.active-filter{border-color:var(--accent);box-shadow:0 0 0 2px rgba(108,143,255,0.2);}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--card-accent,transparent);}
 .stat-card.c-blue{--card-accent:var(--accent);}
 .stat-card.c-green{--card-accent:var(--green);}
@@ -113,7 +116,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 /* TABLE */
 .table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
-.table-header{display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);gap:12px;}
+.table-header{display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;}
 .table-header-title{font-size:13px;font-weight:600;}
 .tcount{font-size:11px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:20px;}
 .search-box{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;}
@@ -150,6 +153,7 @@ tbody tr:last-child td{border-bottom:none;}
 .g2{grid-template-columns:1fr 1fr;}
 .g3{grid-template-columns:1fr 1fr 1fr;}
 .g4{grid-template-columns:1fr 1fr 1fr auto;}
+.g5{grid-template-columns:1fr 1fr 1fr 1fr auto;}
 .fg-app{display:flex;flex-direction:column;gap:5px;}
 .fg-app label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;}
 .fg-app input,.fg-app select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;padding:9px 12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.15s;}
@@ -157,6 +161,8 @@ tbody tr:last-child td{border-bottom:none;}
 .fg-app select option{background:var(--bg3);}
 
 /* ALERTS */
+.alert-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px;}
+.alert-toolbar select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:7px 12px;outline:none;font-family:'DM Sans',sans-serif;}
 .alert-section{margin-bottom:22px;}
 .alert-section-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 .alert-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
@@ -171,6 +177,13 @@ tbody tr:last-child td{border-bottom:none;}
 .alert-detail{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px;}
 .all-ok{text-align:center;padding:56px;color:var(--text3);}
 .all-ok-icon{font-size:40px;margin-bottom:12px;}
+
+/* PRODUCTION LIST */
+.prod-list-row{display:grid;grid-template-columns:1fr 1fr 100px 40px;gap:10px;padding:8px 0;align-items:center;}
+.prod-list-row input,.prod-list-row select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:8px 10px;outline:none;font-family:'DM Sans',sans-serif;width:100%;}
+.prod-list-row .rm-btn{background:var(--red-bg);color:var(--red);border:1px solid rgba(255,107,107,0.2);border-radius:8px;cursor:pointer;padding:6px;font-size:14px;}
+.prod-list-row .rm-btn:hover{background:rgba(255,107,107,0.2);}
+.prod-list-hdr{display:grid;grid-template-columns:1fr 1fr 100px 40px;gap:10px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:8px;}
 
 /* LOG */
 .log-item{display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid var(--border);transition:background 0.1s;}
@@ -206,16 +219,6 @@ tbody tr:last-child td{border-bottom:none;}
 .type-name{flex:1;font-size:14px;font-weight:500;}
 .type-count{font-size:12px;color:var(--text3);background:var(--bg3);padding:2px 10px;border-radius:20px;margin-right:8px;}
 .type-rename-input{flex:1;background:var(--bg3);border:1px solid var(--accent);border-radius:8px;color:var(--text);font-size:13px;padding:6px 10px;outline:none;font-family:'DM Sans',sans-serif;}
-
-/* BULK */
-.bulk-wrap{overflow-x:auto;}
-.bulk-tbl{border-collapse:collapse;min-width:500px;}
-.bulk-tbl th{padding:8px 10px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;text-align:center;}
-.bulk-tbl th:first-child{text-align:left;}
-.bulk-tbl td{padding:5px 5px;}
-.bulk-tbl td:first-child{padding-left:0;font-size:13px;font-weight:500;padding-right:12px;}
-.bulk-input{width:62px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:6px;text-align:center;font-family:'DM Mono',monospace;outline:none;}
-.bulk-input:focus{border-color:var(--accent);}
 
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;}
@@ -291,14 +294,6 @@ tbody tr:last-child td{border-bottom:none;}
 @keyframes flashGreen{0%{background:var(--bg);}40%{background:rgba(61,214,140,0.2);border-color:var(--green);}100%{background:var(--bg);}}
 @keyframes flashRed{0%{background:var(--bg);}40%{background:rgba(255,107,107,0.2);border-color:var(--red);}100%{background:var(--bg);}}
 
-/* barcode manage */
-.barcode-row{display:grid;grid-template-columns:1fr 80px 180px 110px;gap:10px;padding:11px 20px;border-bottom:1px solid var(--border);align-items:center;}
-.barcode-row:last-child{border-bottom:none;}
-.barcode-row:hover{background:var(--bg3);}
-.barcode-hdr{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;padding:8px 20px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 80px 180px 110px;gap:10px;}
-.bc-input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;padding:6px 10px;font-family:'DM Mono',monospace;outline:none;width:100%;}
-.bc-input:focus{border-color:var(--accent);}
-
 /* worker perf */
 .worker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
 .worker-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;position:relative;}
@@ -331,6 +326,56 @@ tbody tr:last-child td{border-bottom:none;}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+
+/* ============ PIECE-LEVEL BARCODES ============ */
+.piece-pill{background:rgba(108,143,255,0.12);color:var(--accent);padding:2px 8px;border-radius:6px;font-family:'DM Mono',monospace;font-size:11px;border:1px solid rgba(108,143,255,0.2);}
+.piece-status-avail{background:var(--green-bg);color:var(--green);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.piece-status-used{background:var(--red-bg);color:var(--red);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.piece-status-gen{background:var(--amber-bg);color:var(--amber);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+
+.gen-preview{background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--radius);padding:20px;text-align:center;margin-top:14px;}
+.gen-preview-sample{display:inline-block;padding:12px 20px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;margin-top:10px;}
+.gen-preview-code{font-family:'DM Mono',monospace;font-size:15px;color:var(--accent);letter-spacing:0.08em;}
+
+.batch-list{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);margin-top:16px;max-height:320px;overflow-y:auto;}
+.batch-row{display:flex;justify-content:space-between;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border);font-size:13px;}
+.batch-row:last-child{border-bottom:none;}
+.batch-row:hover{background:var(--bg3);}
+
+/* Print labels view */
+.print-view{position:fixed;inset:0;background:#fff;color:#000;z-index:200;overflow-y:auto;padding:20px;display:none;}
+.print-view.open{display:block;}
+.print-toolbar{position:sticky;top:0;background:#fff;padding:10px 16px;border-bottom:2px solid #000;display:flex;gap:10px;align-items:center;flex-wrap:wrap;z-index:5;margin:-20px -20px 20px -20px;}
+.print-toolbar select,.print-toolbar button{font-family:'DM Sans',sans-serif;font-size:13px;padding:6px 12px;border:1px solid #333;background:#fff;color:#000;cursor:pointer;border-radius:6px;}
+.print-toolbar button.primary{background:#000;color:#fff;}
+.labels-grid{display:grid;gap:4mm;}
+.labels-grid.size-small{grid-template-columns:repeat(5,1fr);}
+.labels-grid.size-medium{grid-template-columns:repeat(4,1fr);}
+.labels-grid.size-large{grid-template-columns:repeat(3,1fr);}
+.labels-grid.size-thermal{grid-template-columns:repeat(1,1fr);max-width:58mm;}
+.label{border:1px dashed #999;padding:8px 6px;text-align:center;page-break-inside:avoid;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:28mm;background:#fff;}
+.label svg{max-width:100%;height:auto;}
+.label-name{font-size:10px;font-weight:600;margin-bottom:3px;color:#000;}
+.label-code{font-family:monospace;font-size:9px;color:#000;margin-top:2px;letter-spacing:0.05em;}
+
+@media print {
+  .print-toolbar{display:none !important;}
+  .print-view{position:static;padding:0;margin:0;}
+  body * {visibility:hidden;}
+  .print-view,.print-view *{visibility:visible;}
+  .print-view{position:absolute;left:0;top:0;width:100%;}
+  .label{border:1px dashed #ccc;}
+  @page {margin:8mm;}
+}
+
+/* PRODUCTION LIST PRINT */
+.prodlist-print{position:fixed;inset:0;background:#fff;color:#000;z-index:200;overflow-y:auto;padding:20px;display:none;font-family:Arial,sans-serif;}
+.prodlist-print.open{display:block;}
+.prodlist-print h1{font-size:22px;margin-bottom:6px;}
+.prodlist-print table{width:100%;border-collapse:collapse;margin-top:12px;}
+.prodlist-print th,.prodlist-print td{border:1px solid #333;padding:8px 10px;text-align:left;color:#000;font-size:13px;}
+.prodlist-print th{background:#eee;}
+@media print { .prodlist-print-toolbar{display:none !important;} }
 </style>
 </head>
 <body>
@@ -397,11 +442,15 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         <div class="nav-section">Main</div>
         <div class="nav-item active" onclick="switchView('stock')">
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-          Stock View
+          Dashboard
         </div>
         <div class="nav-item" onclick="switchView('alerts')" id="nav-alerts">
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
           Alerts
+        </div>
+        <div class="nav-item nav-manager" onclick="switchView('workers')">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          Worker Stats
         </div>
 
         <div class="nav-section nav-action-section" style="margin-top:6px;">Scanner</div>
@@ -409,29 +458,21 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h4v4H4V4zm12 0h4v4h-4V4zM4 16h4v4H4v-4zm12 0h4v4h-4v-4zM10 4v16M6 10h12M6 14h12"/></svg>
           Scan Mode
         </div>
-        <div class="nav-item nav-manager" onclick="switchView('workers')">
-          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-          Worker Stats
-        </div>
 
-        <div class="nav-section" style="margin-top:6px;">Actions</div>
-        <div class="nav-item nav-manager" onclick="switchView('add')">
-          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          Stock Add
+        <div class="nav-section" style="margin-top:6px;">Pieces</div>
+        <div class="nav-item nav-manager" onclick="switchView('genpieces')">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+          Generate Barcodes
         </div>
-        <div class="nav-item nav-manager" onclick="switchView('print')">
-          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-          Print Minus
+        <div class="nav-item nav-manager" onclick="switchView('pieces')">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          Stock Details
         </div>
 
         <div class="nav-section nav-admin-section" style="margin-top:6px;">Settings</div>
         <div class="nav-item nav-manager" onclick="switchView('minstock')">
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
           Min Stock
-        </div>
-        <div class="nav-item nav-admin" onclick="switchView('barcodes')">
-          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h2v16H4V4zm4 0h1v16H8V4zm3 0h2v16h-2V4zm4 0h1v16h-1V4zm3 0h2v16h-2V4z"/></svg>
-          Barcodes
         </div>
         <div class="nav-item nav-admin" onclick="switchView('types')">
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
@@ -461,7 +502,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     <main class="main">
       <div class="topbar">
         <div>
-          <div class="topbar-title" id="topbar-title">Stock View</div>
+          <div class="topbar-title" id="topbar-title">Dashboard</div>
           <div style="font-size:12px;color:var(--text3);" id="topbar-sub">Saari inventory ek jagah</div>
         </div>
       </div>
@@ -478,6 +519,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
                 <span style="color:var(--text3);font-size:13px;">🔍</span>
                 <input type="text" id="search-input" placeholder="Search..." oninput="filterTable()">
               </div>
+              <button class="btn btn-secondary btn-sm" id="bulk-edit-btn" style="margin-left:8px;" onclick="openBulkEditModal()">⚡ Bulk Edit</button>
             </div>
             <div id="inv-table-wrap"><div class="loader"><div class="spinner"></div> Loading...</div></div>
           </div>
@@ -485,7 +527,41 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
         <!-- ALERTS -->
         <div id="view-alerts" class="view">
-          <div id="alerts-content"><div class="loader"><div class="spinner"></div> Loading...</div></div>
+          <div class="panel">
+            <div class="panel-title">Create Production List</div>
+            <div class="panel-sub">Manually fill karo kya kya kitna banana hai. Print / Export kar sakte ho — koi record save nahi hota.</div>
+            <div class="prod-list-hdr">
+              <span>Product</span><span>Size</span><span style="text-align:center;">Qty</span><span></span>
+            </div>
+            <div id="prod-list-rows"></div>
+            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+              <button class="btn btn-secondary" onclick="addProdListRow()">+ Add Row</button>
+              <button class="btn btn-secondary" onclick="fillProdListFromAlerts()">↯ Fill from Alerts</button>
+              <button class="btn btn-ghost" onclick="clearProdList()">Clear</button>
+              <button class="btn btn-primary" style="width:auto;margin-left:auto;" onclick="printProdList()">🖨 Print / Export</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">Alerts</div>
+            <div class="panel-sub">Low aur out-of-stock items ka list. Filter laga ke production list mein add kar sakte ho.</div>
+            <div class="alert-toolbar">
+              <select id="alert-status-filter" onchange="renderAlertsView()">
+                <option value="all">All Issues</option>
+                <option value="out">Only Out of Stock</option>
+                <option value="low">Only Low Stock</option>
+              </select>
+              <select id="alert-type-filter" onchange="renderAlertsView()">
+                <option value="">All Products</option>
+              </select>
+              <select id="alert-size-filter" onchange="renderAlertsView()">
+                <option value="">All Sizes</option>
+                <option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>2XL</option><option>3XL</option>
+              </select>
+              <button class="btn btn-ghost btn-sm" onclick="exportAlertsCSV()">↓ Export CSV</button>
+            </div>
+            <div id="alerts-content"><div class="loader"><div class="spinner"></div> Loading...</div></div>
+          </div>
         </div>
 
         <!-- ============ SCANNER VIEW ============ -->
@@ -575,64 +651,89 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
           <div id="worker-grid-wrap"><div class="loader"><div class="spinner"></div> Loading...</div></div>
         </div>
 
-        <!-- ============ BARCODES ADMIN ============ -->
-        <div id="view-barcodes" class="view">
+        <!-- ============ GENERATE PIECES ============ -->
+        <div id="view-genpieces" class="view">
           <div class="panel">
-            <div class="panel-title">Barcode Management</div>
-            <div class="panel-sub">Har product-size combination ke liye unique barcode assign karo. Auto-generate ya manual.</div>
-            <div style="display:flex;gap:10px;">
-              <button class="btn btn-primary" style="width:auto;" onclick="autoGenerateAllBarcodes()">⚡ Auto-Generate Missing</button>
-              <button class="btn btn-ghost" onclick="renderBarcodesView()">Refresh</button>
+            <div class="panel-title">Generate Unique Piece Barcodes</div>
+            <div class="panel-sub">Bas barcodes banenge — stock abhi add nahi hoga. Jab scan ADD mode mein karoge, tabhi piece stock mein aayega. Har piece ek baar hi scan ho sakta hai.</div>
+            <div class="form-grid g3" style="align-items:end;margin-bottom:14px;">
+              <div class="fg-app"><label>Product Type</label><select id="gen-type" onchange="updateGenSizes()"></select></div>
+              <div class="fg-app"><label>Size</label><select id="gen-size" onchange="updateGenSample()"></select></div>
+              <div class="fg-app"><label>Quantity</label><input type="number" id="gen-qty" min="1" max="5000" value="50"></div>
             </div>
+            <div class="gen-preview" id="gen-preview">
+              <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Sample barcode format</div>
+              <div class="gen-preview-sample">
+                <div class="gen-preview-code" id="gen-sample">HD-M-000001-A7K9</div>
+              </div>
+              <div style="font-size:12px;color:var(--text3);margin-top:8px;">Har piece ka unique barcode, sequential + random combo</div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:10px;">
+              <button class="btn btn-primary" style="width:auto;" onclick="generatePieces()">⚡ Generate Barcodes</button>
+            </div>
+            <div id="gen-result" style="margin-top:16px;"></div>
           </div>
-          <div class="table-wrap">
-            <div class="table-header">
-              <span class="table-header-title">All Barcodes</span>
-              <span class="tcount" id="bc-count">—</span>
+
+          <div class="panel">
+            <div class="panel-title">How it works (Full Flow)</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;">
+              <b style="color:var(--text);">Step 1:</b> Generate karo (e.g. 50 Hoodie M barcodes) — <span style="color:var(--amber);">stock abhi +0 hi rahega</span><br>
+              <b style="color:var(--text);">Step 2:</b> "Print Labels" → stickers nikalo aur pieces pe chipka do<br>
+              <b style="color:var(--text);">Step 3:</b> Jab pieces ready ho jaayen (stock mein aayen), Scanner → <span style="color:var(--green);">ADD mode</span> → har piece scan → stock +1 per scan<br>
+              <b style="color:var(--text);">Step 4:</b> Jab print/dispatch ho, Scanner → <span style="color:var(--red);">MINUS mode</span> → scan → stock -1 per scan<br>
+              <b style="color:var(--text);">Benefit:</b> Har piece ek baar ADD hota hai, ek baar MINUS. Dubara scan = "Already scanned" error. 100% cheating-proof.
             </div>
-            <div class="barcode-hdr"><span>Product · Size</span><span style="text-align:center;">Stock</span><span>Barcode</span><span style="text-align:center;">Action</span></div>
-            <div id="barcodes-list"><div class="loader"><div class="spinner"></div> Loading...</div></div>
           </div>
         </div>
 
-        <!-- STOCK ADD -->
-        <div id="view-add" class="view">
+        <!-- ============ BROWSE PIECES ============ -->
+        <div id="view-pieces" class="view">
           <div class="panel">
-            <div class="panel-title">New Stock Entry</div>
-            <div class="panel-sub">Naya stock aaya toh yahan add karo</div>
-            <div class="form-grid g2" style="margin-bottom:14px;">
-              <div class="fg-app"><label>Product Type</label><select id="add-type"></select></div>
-              <div class="fg-app"><label>Size</label>
-                <select id="add-size">
-                  <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>2XL</option><option>3XL</option>
+            <div class="panel-title">All Pieces</div>
+            <div class="panel-sub">Saare physical pieces ka record. Filter karke dekho kaun scan hua, kaun pending hai.</div>
+            <div class="form-grid g5" style="align-items:end;">
+              <div class="fg-app"><label>Product</label>
+                <select id="pc-filter-type" onchange="onPiecesFilterChange()">
+                  <option value="">All products</option>
                 </select>
               </div>
+              <div class="fg-app"><label>Size</label>
+                <select id="pc-filter-size" onchange="onPiecesFilterChange()">
+                  <option value="">All sizes</option>
+                  <option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>2XL</option><option>3XL</option>
+                </select>
+              </div>
+              <div class="fg-app"><label>Status</label>
+                <select id="pc-filter-status" onchange="onPiecesFilterChange()">
+                  <option value="">All</option>
+                  <option value="generated">Generated (barcode printed, not in stock)</option>
+                  <option value="available">Available (in stock)</option>
+                  <option value="used">Used (dispatched)</option>
+                </select>
+              </div>
+              <div class="fg-app"><label>Search Barcode</label>
+                <input type="text" id="pc-filter-search" oninput="onPiecesFilterChange()" placeholder="Type barcode...">
+              </div>
+              <button class="btn btn-ghost" onclick="renderPiecesView()">Refresh</button>
             </div>
-            <div class="form-grid g2" style="margin-bottom:20px;">
-              <div class="fg-app"><label>Quantity</label><input type="number" id="add-qty" min="1" value="50"></div>
-              <div class="fg-app"><label>Min Stock (optional)</label><input type="number" id="add-min" min="0" value="20"></div>
-            </div>
-            <button class="btn btn-primary" style="width:auto;" onclick="addStock()">Add Stock</button>
           </div>
-        </div>
-
-        <!-- PRINT MINUS -->
-        <div id="view-print" class="view">
-          <div class="panel">
-            <div class="panel-title">Single Print Entry</div>
-            <div class="panel-sub">Jo items print ho gaye unko minus karo</div>
-            <div class="form-grid g4" style="align-items:end;margin-bottom:4px;">
-              <div class="fg-app"><label>Product Type</label><select id="ptype" onchange="updatePSizes()"></select></div>
-              <div class="fg-app"><label>Size</label><select id="psize"></select></div>
-              <div class="fg-app"><label>Qty Printed</label><input type="number" id="pqty" min="1" value="1"></div>
-              <button class="btn btn-danger" onclick="minusStock()" style="height:38px;">Minus</button>
+          <div class="stats-row" id="pieces-stats"></div>
+          <div class="table-wrap">
+            <div class="table-header" style="flex-wrap:wrap;gap:8px;">
+              <span class="table-header-title">Pieces</span>
+              <span class="tcount" id="pc-count">—</span>
+              <span id="pc-selected-info" style="font-size:12px;color:var(--amber);font-weight:500;"></span>
+              <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-ghost btn-sm" id="pc-clear-sel" onclick="clearPieceSelection()" style="display:none;">✕ Clear Selection</button>
+                <button class="btn btn-ghost btn-sm" id="pc-sel-all-match" onclick="selectAllMatching()">☑ Select All Matching</button>
+                <button class="btn btn-secondary btn-sm" id="pc-export-sel" onclick="exportSelectedPiecesCSV()" style="display:none;">↓ Export Selected CSV</button>
+                <button class="btn btn-ghost btn-sm" onclick="exportAllFilteredPiecesCSV()">↓ Export All (Filter)</button>
+                <button class="btn btn-secondary btn-sm" onclick="printFilteredLabels()">🏷 Print Labels</button>
+                <button class="btn btn-danger btn-sm" id="pc-bulk-delete" onclick="bulkDeleteGeneratedPieces()" style="display:none;">🗑 Delete Generated</button>
+              </div>
             </div>
-          </div>
-          <div class="panel">
-            <div class="panel-title">Bulk Print Entry</div>
-            <div class="panel-sub">Ek saath multiple sizes minus karo</div>
-            <div class="bulk-wrap"><table class="bulk-tbl" id="bulk-tbl"></table></div>
-            <div style="margin-top:16px;"><button class="btn btn-danger" onclick="doBulkMinus()">Sab Minus Karo</button></div>
+            <div id="pieces-list"><div class="loader"><div class="spinner"></div> Loading...</div></div>
+            <div id="pc-pagination" style="display:none;padding:14px 20px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;"></div>
           </div>
         </div>
 
@@ -659,7 +760,14 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             </div>
           </div>
           <div class="table-wrap">
-            <div class="table-header"><span class="table-header-title">All Product Types</span></div>
+            <div class="table-header">
+              <span class="table-header-title">All Product Types</span>
+              <span class="tcount" id="types-count">—</span>
+              <div class="search-box">
+                <span style="color:var(--text3);font-size:13px;">🔍</span>
+                <input type="text" id="types-search" placeholder="Search type name..." oninput="renderTypesListView()">
+              </div>
+            </div>
             <div id="types-list"><div class="loader"><div class="spinner"></div> Loading...</div></div>
           </div>
         </div>
@@ -689,6 +797,69 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
         <!-- HISTORY -->
         <div id="view-log" class="view">
+          <div class="panel" id="log-filters-panel" style="display:none;">
+            <div class="panel-title">Filter History</div>
+            <div class="panel-sub">Admin: kisi bhi user ki activity filter karo</div>
+            <div class="form-grid g3" style="align-items:end;">
+              <div class="fg-app">
+                <label>User</label>
+                <select id="log-user-filter" onchange="renderLogView()">
+                  <option value="">All users</option>
+                </select>
+              </div>
+              <div class="fg-app">
+                <label>Action</label>
+                <select id="log-action-filter" onchange="renderLogView()">
+                  <option value="">All actions</option>
+                  <option value="add">Manual Add</option>
+                  <option value="print">Manual Print/Minus</option>
+                  <option value="update-add">Update-Add</option>
+                  <option value="update-sub">Update-Sub</option>
+                  <option value="scan-add">Scan-Add</option>
+                  <option value="scan-sub">Scan-Sub</option>
+                </select>
+              </div>
+              <button class="btn btn-ghost" onclick="renderLogView()">Refresh</button>
+            </div>
+          </div>
+
+          <div class="panel" id="log-danger-panel" style="display:none;border:1px solid rgba(232,76,79,0.25);background:linear-gradient(180deg,rgba(232,76,79,0.04),transparent);">
+            <div class="panel-title" style="color:var(--red);">⚠ Danger Zone — Admin Only</div>
+            <div class="panel-sub">Delete karna undo nahi ho sakta. Dhyaan se use karo.</div>
+
+            <div style="margin-top:14px;padding:14px;background:var(--bg2);border:1px solid var(--bd1);border-radius:var(--radius);">
+              <div style="font-weight:600;margin-bottom:6px;">🗑 Delete History by Date Range</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Selected range ke andar jo bhi user ne changes kiye hain, un ka activity log delete ho jayega. (Stock/pieces rollback NAHI honge — sirf log entries hatenge.)</div>
+              <div class="form-grid g3" style="align-items:end;">
+                <div class="fg-app">
+                  <label>From (date &amp; time)</label>
+                  <input type="datetime-local" id="log-del-from">
+                </div>
+                <div class="fg-app">
+                  <label>To (date &amp; time)</label>
+                  <input type="datetime-local" id="log-del-to">
+                </div>
+                <div class="fg-app">
+                  <label>User (optional)</label>
+                  <select id="log-del-user">
+                    <option value="">All users</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap;">
+                <button class="btn btn-ghost btn-sm" onclick="previewDeleteHistory()">👁 Preview Count</button>
+                <span id="log-del-preview" style="font-size:12px;color:var(--text3);"></span>
+                <button class="btn btn-danger" style="margin-left:auto;width:auto;" onclick="deleteHistoryRange()">Delete History</button>
+              </div>
+            </div>
+
+            <div style="margin-top:14px;padding:14px;background:var(--bg2);border:1px solid rgba(232,76,79,0.3);border-radius:var(--radius);">
+              <div style="font-weight:600;margin-bottom:6px;color:var(--red);">💣 Full System Reset</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">SAARI activity history, SAARE pieces (generated + available + used), aur SAARI inventory stock counts zero ho jayenge. Product types aur users safe rahenge. <b>Ye production ke liye hai jab aap fresh start karna chahte ho.</b></div>
+              <button class="btn btn-danger" style="width:auto;" onclick="fullSystemReset()">💣 Reset Everything</button>
+            </div>
+          </div>
+
           <div class="table-wrap">
             <div class="table-header"><span class="table-header-title">Activity Log</span><span class="tcount" id="log-count">—</span></div>
             <div id="log-list"><div class="loader"><div class="spinner"></div> Loading...</div></div>
@@ -717,6 +888,31 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('edit-modal')">Cancel</button>
       <button class="btn btn-primary" id="modal-confirm-btn" style="width:auto;" onclick="confirmEdit()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- BULK EDIT MODAL -->
+<div class="modal-overlay" id="bulk-edit-modal">
+  <div class="modal" style="max-width:860px;">
+    <div class="modal-title">⚡ Bulk Edit Stock</div>
+    <div class="modal-sub">Jo items edit karne hain, unmein <b>New Stock</b> column mein naya number daal do. Khaali chhodo toh skip ho jayega. Pieces table auto-sync hoga.</div>
+    <div style="display:flex;gap:8px;margin:10px 0 12px;flex-wrap:wrap;align-items:center;">
+      <input type="text" id="bulk-search" placeholder="🔍 Search product..." oninput="renderBulkEditRows()" style="flex:1;min-width:180px;padding:8px 12px;background:var(--bg2);border:1px solid var(--bd1);border-radius:var(--radius);color:var(--text1);font-size:13px;">
+      <span id="bulk-changed-count" style="font-size:12px;color:var(--text3);"></span>
+      <button class="btn btn-ghost btn-sm" onclick="clearBulkEdits()">Clear All</button>
+    </div>
+    <div style="max-height:55vh;overflow-y:auto;border:1px solid var(--bd1);border-radius:var(--radius);">
+      <table id="bulk-edit-table" style="width:100%;">
+        <thead style="position:sticky;top:0;background:var(--bg2);z-index:1;">
+          <tr><th>Product</th><th>Size</th><th style="text-align:right;">Current</th><th style="text-align:center;">New Stock</th><th style="text-align:center;">Δ</th></tr>
+        </thead>
+        <tbody id="bulk-edit-tbody"></tbody>
+      </table>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('bulk-edit-modal')">Cancel</button>
+      <button class="btn btn-primary" id="bulk-apply-btn" style="width:auto;" onclick="applyBulkEdit()">Apply Changes</button>
     </div>
   </div>
 </div>
@@ -754,6 +950,35 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   </div>
 </div>
 
+<!-- PRINT LABELS OVERLAY -->
+<div class="print-view" id="print-view">
+  <div class="print-toolbar">
+    <span style="font-weight:600;">🏷 Labels — <span id="print-count">0</span> pcs</span>
+    <label>Size:
+      <select id="print-size" onchange="renderPrintLabels()">
+        <option value="small">Small (5 per row, A4)</option>
+        <option value="medium" selected>Medium (4 per row, A4)</option>
+        <option value="large">Large (3 per row, A4)</option>
+        <option value="thermal">Thermal (1 per row, 58mm)</option>
+      </select>
+    </label>
+    <button class="primary" onclick="window.print()">🖨 Print</button>
+    <button onclick="closePrintView()">✕ Close</button>
+  </div>
+  <div id="print-labels-grid" class="labels-grid size-medium"></div>
+</div>
+
+<!-- PRODUCTION LIST PRINT OVERLAY -->
+<div class="prodlist-print" id="prodlist-print-view">
+  <div class="prodlist-print-toolbar" style="position:sticky;top:0;background:#fff;padding:10px 16px;border-bottom:2px solid #000;display:flex;gap:10px;align-items:center;margin:-20px -20px 20px -20px;">
+    <span style="font-weight:600;">📋 Production List</span>
+    <button onclick="window.print()" style="background:#000;color:#fff;padding:6px 14px;border:none;border-radius:6px;cursor:pointer;">🖨 Print</button>
+    <button onclick="downloadProdListCSV()" style="padding:6px 14px;border:1px solid #333;background:#fff;border-radius:6px;cursor:pointer;">↓ CSV</button>
+    <button onclick="closeProdListPrint()" style="padding:6px 14px;border:1px solid #333;background:#fff;border-radius:6px;cursor:pointer;margin-left:auto;">✕ Close</button>
+  </div>
+  <div id="prodlist-print-body"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -766,6 +991,15 @@ let editItemId = null;
 let editMode = 'add';
 let deleteTypeName = null;
 let roleChangeUserId = null;
+
+// Piece-level state
+let piecesCache = [];
+let piecesMapByBarcode = new Map();
+let lastGeneratedPieces = [];
+let labelsToPrint = [];
+
+// Production list state (in-memory, not persisted)
+let prodList = [];
 
 // ─── AUTH ───
 function authTab(tab) {
@@ -817,10 +1051,7 @@ async function doSignup() {
 }
 
 async function doLogout() {
-  try {
-    await sb.auth.signOut();
-  } catch(e){}
-  // hard clear any stuck tokens before reload
+  try { await sb.auth.signOut(); } catch(e){}
   try {
     Object.keys(localStorage).filter(k=>k.includes('supabase')||k.startsWith('sb-')).forEach(k=>localStorage.removeItem(k));
   } catch(e){}
@@ -828,13 +1059,9 @@ async function doLogout() {
 }
 
 // ─── SESSION BOOTSTRAP ───
-// IMPORTANT: onAuthStateChange callback must NOT be async directly.
-// Supabase docs: async work inside it can deadlock the auth client.
-// We wrap async work in setTimeout(0) so it runs outside the auth lock.
 let _appInitialized = false;
 
 sb.auth.onAuthStateChange((event, session) => {
-  // Don't block the auth event — defer async work
   setTimeout(async () => {
     try {
       if (event === 'SIGNED_OUT' || !session?.user) {
@@ -845,7 +1072,6 @@ sb.auth.onAuthStateChange((event, session) => {
         document.getElementById('app-screen').style.display = 'none';
         return;
       }
-      // For any event with a session, ensure app is initialized
       if (!_appInitialized || currentUser?.id !== session.user.id) {
         currentUser = session.user;
         await loadProfile();
@@ -859,14 +1085,11 @@ sb.auth.onAuthStateChange((event, session) => {
   }, 0);
 });
 
-// On first page load, explicitly check for an existing session.
-// This is more reliable than waiting for onAuthStateChange on reload.
 (async function bootstrapSession(){
   try {
     const {data:{session}, error} = await sb.auth.getSession();
     if(error){
       console.error('getSession error:',error);
-      // corrupt token — clear and show login
       Object.keys(localStorage).filter(k=>k.includes('supabase')||k.startsWith('sb-')).forEach(k=>localStorage.removeItem(k));
       return;
     }
@@ -882,7 +1105,6 @@ sb.auth.onAuthStateChange((event, session) => {
 })();
 
 async function loadProfile() {
-  // Helper: race any promise against a timeout
   const withTimeout = (p,ms,label) => Promise.race([
     p,
     new Promise((_,rej)=>setTimeout(()=>rej(new Error(label+' timeout')),ms))
@@ -896,7 +1118,6 @@ async function loadProfile() {
     if(first){currentProfile=first;return;}
   } catch(e){console.warn('Profile fetch slow:',e.message);}
 
-  // short retry (trigger may be creating row)
   for(let i=0;i<2;i++){
     await new Promise(r=>setTimeout(r,400));
     try {
@@ -908,7 +1129,6 @@ async function loadProfile() {
     } catch(e){}
   }
 
-  // fallback: create profile OR use in-memory default if even that fails
   try {
     const {data,error}=await withTimeout(
       sb.from('profiles').upsert({
@@ -949,7 +1169,7 @@ async function loadAll() {
 }
 async function loadTypes() {
   const {data}=await sb.from('product_types').select('*').order('name');
-  allTypes=data||[]; refreshTypeDropdowns();
+  allTypes=data||[];
 }
 async function loadInventory() {
   const {data}=await sb.from('inventory').select('*, product_types(name)').order('id');
@@ -964,16 +1184,25 @@ function statusBadge(item){
   return'<span class="badge badge-ok">In Stock</span>';
 }
 
-// ─── STATS ───
+// ─── DASHBOARD STATS (CLICKABLE) ───
 function renderStats(){
   const total=allInventory.reduce((a,i)=>a+i.stock,0);
   const low=allInventory.filter(i=>getStatus(i)==='low').length;
   const out=allInventory.filter(i=>getStatus(i)==='out').length;
   document.getElementById('stats').innerHTML=`
-    <div class="stat-card c-blue"><div class="stat-icon">📦</div><div class="stat-label">Total Stock</div><div class="stat-value">${total.toLocaleString()}</div></div>
-    <div class="stat-card c-green"><div class="stat-icon">🏷</div><div class="stat-label">Product Types</div><div class="stat-value">${allTypes.length}</div></div>
-    <div class="stat-card c-amber"><div class="stat-icon">⚠</div><div class="stat-label">Low Stock</div><div class="stat-value ${low>0?'amber':''}">${low}</div></div>
-    <div class="stat-card c-red"><div class="stat-icon">🚫</div><div class="stat-label">Out of Stock</div><div class="stat-value ${out>0?'red':''}">${out}</div></div>`;
+    <div class="stat-card c-blue clickable" onclick="switchView('pieces')" title="Open Stock Details"><div class="stat-icon">📦</div><div class="stat-label">Total Stock</div><div class="stat-value">${total.toLocaleString()}</div></div>
+    <div class="stat-card c-green clickable" onclick="switchView('types')" title="Manage Product Types"><div class="stat-icon">🏷</div><div class="stat-label">Product Types</div><div class="stat-value">${allTypes.length}</div></div>
+    <div class="stat-card c-amber clickable" onclick="jumpToAlerts('low')" title="View Low Stock"><div class="stat-icon">⚠</div><div class="stat-label">Low Stock</div><div class="stat-value ${low>0?'amber':''}">${low}</div></div>
+    <div class="stat-card c-red clickable" onclick="jumpToAlerts('out')" title="View Out of Stock"><div class="stat-icon">🚫</div><div class="stat-label">Out of Stock</div><div class="stat-value ${out>0?'red':''}">${out}</div></div>`;
+}
+
+function jumpToAlerts(filter){
+  switchView('alerts');
+  // set filter after view switch
+  setTimeout(()=>{
+    const sel=document.getElementById('alert-status-filter');
+    if(sel){sel.value=filter;renderAlertsView();}
+  },30);
 }
 
 // ─── TABLE ───
@@ -984,13 +1213,14 @@ function renderTable(){
   document.getElementById('inv-count').textContent=`${filtered.length} items`;
   const role=currentProfile?.role||'viewer';
   const canEdit=['admin','manager'].includes(role);
+  const bulkBtn=document.getElementById('bulk-edit-btn');
+  if(bulkBtn)bulkBtn.style.display=canEdit?'':'none';
   const wrap=document.getElementById('inv-table-wrap');
   if(!filtered.length){wrap.innerHTML='<div class="empty-state">No items found</div>';return;}
-  wrap.innerHTML=`<table><thead><tr><th>Product</th><th>Size</th><th>Barcode</th><th>Stock</th><th>Min</th><th>Status</th>${canEdit?'<th>Action</th>':''}</tr></thead><tbody>
+  wrap.innerHTML=`<table><thead><tr><th>Product</th><th>Size</th><th>Stock</th><th>Min</th><th>Status</th>${canEdit?'<th>Action</th>':''}</tr></thead><tbody>
     ${filtered.map(item=>`<tr>
       <td style="font-weight:500;">${item.typeName}</td>
       <td><span class="size-pill">${item.size}</span></td>
-      <td>${item.barcode?`<span class="barcode-pill">${item.barcode}</span>`:'<span style="color:var(--text3);font-size:11px;">—</span>'}</td>
       <td class="cell-mono">${item.stock}</td>
       <td class="cell-mono" style="color:var(--text3);">${item.min_stock}</td>
       <td>${statusBadge(item)}</td>
@@ -1006,154 +1236,164 @@ function updateAlertNav(){
   const ex=nav.querySelector('.nav-badge');if(ex)ex.remove();
   if(count>0){const b=document.createElement('span');b.className='nav-badge';b.textContent=count;nav.appendChild(b);}
 }
+
+function refreshAlertTypeDropdown(){
+  const sel=document.getElementById('alert-type-filter');
+  if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">All Products</option>'+allTypes.map(t=>`<option value="${t.id}" ${t.id==cur?'selected':''}>${t.name}</option>`).join('');
+}
+
+function getFilteredAlerts(){
+  const statusF=document.getElementById('alert-status-filter')?.value||'all';
+  const typeF=document.getElementById('alert-type-filter')?.value||'';
+  const sizeF=document.getElementById('alert-size-filter')?.value||'';
+  return allInventory.filter(i=>{
+    const s=getStatus(i);
+    if(s==='ok')return false;
+    if(statusF==='out'&&s!=='out')return false;
+    if(statusF==='low'&&s!=='low')return false;
+    if(typeF&&i.product_type_id!=typeF)return false;
+    if(sizeF&&i.size!==sizeF)return false;
+    return true;
+  });
+}
+
 function renderAlertsView(){
-  const out=allInventory.filter(i=>getStatus(i)==='out');
-  const low=allInventory.filter(i=>getStatus(i)==='low');
+  refreshAlertTypeDropdown();
+  const items=getFilteredAlerts();
   const el=document.getElementById('alerts-content');
-  if(!out.length&&!low.length){el.innerHTML='<div class="all-ok"><div class="all-ok-icon">✅</div><p>Sab stock theek hai!</p></div>';return;}
+  if(!items.length){
+    el.innerHTML='<div class="all-ok"><div class="all-ok-icon">✅</div><p>Is filter ke andar koi alert nahi</p></div>';
+    return;
+  }
+  const out=items.filter(i=>getStatus(i)==='out');
+  const low=items.filter(i=>getStatus(i)==='low');
   let h='';
-  if(out.length){h+=`<div class="alert-section"><div class="alert-section-title">Out of Stock (${out.length})</div>${out.map(i=>`<div class="alert-card is-out"><div class="alert-icon out">🚫</div><div class="alert-info"><div class="alert-name">${i.typeName} · ${i.size}</div><div class="alert-detail">0 pcs · min: ${i.min_stock}</div></div><span class="badge badge-out">Out</span></div>`).join('')}</div>`;}
-  if(low.length){h+=`<div class="alert-section"><div class="alert-section-title">Low Stock (${low.length})</div>${low.map(i=>`<div class="alert-card is-low"><div class="alert-icon low">⚠️</div><div class="alert-info"><div class="alert-name">${i.typeName} · ${i.size}</div><div class="alert-detail">${i.stock} pcs · min: ${i.min_stock}</div></div><span class="badge badge-low">Low</span></div>`).join('')}</div>`;}
+  if(out.length){h+=`<div class="alert-section"><div class="alert-section-title">Out of Stock (${out.length})</div>${out.map(i=>`<div class="alert-card is-out"><div class="alert-icon out">🚫</div><div class="alert-info"><div class="alert-name">${i.typeName} · ${i.size}</div><div class="alert-detail">0 pcs · min: ${i.min_stock}</div></div><button class="btn btn-secondary btn-sm" onclick="addToProdListFromAlert(${i.id})">+ To List</button><span class="badge badge-out" style="margin-left:8px;">Out</span></div>`).join('')}</div>`;}
+  if(low.length){h+=`<div class="alert-section"><div class="alert-section-title">Low Stock (${low.length})</div>${low.map(i=>`<div class="alert-card is-low"><div class="alert-icon low">⚠️</div><div class="alert-info"><div class="alert-name">${i.typeName} · ${i.size}</div><div class="alert-detail">${i.stock} pcs · min: ${i.min_stock}</div></div><button class="btn btn-secondary btn-sm" onclick="addToProdListFromAlert(${i.id})">+ To List</button><span class="badge badge-low" style="margin-left:8px;">Low</span></div>`).join('')}</div>`;}
   el.innerHTML=h;
 }
 
-// ─── ADD/MINUS (existing flows) ───
-function refreshTypeDropdowns(){
-  ['add-type','ptype'].forEach(id=>{
-    const el=document.getElementById(id);if(!el)return;
-    const cur=el.value;
-    el.innerHTML=allTypes.map(t=>`<option value="${t.id}" ${t.id==cur?'selected':''}>${t.name}</option>`).join('');
-  });
-  updatePSizes();
+function exportAlertsCSV(){
+  const items=getFilteredAlerts();
+  if(!items.length){showToast('Export karne ko kuch nahi','error');return;}
+  const csv='Product,Size,Current Stock,Min Stock,Shortage,Status\n'+items.map(i=>{
+    const s=getStatus(i);
+    const shortage=Math.max(0,i.min_stock-i.stock);
+    return `"${i.typeName}","${i.size}",${i.stock},${i.min_stock},${shortage},"${s==='out'?'Out of Stock':'Low Stock'}"`;
+  }).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`alerts_${Date.now()}.csv`;a.click();URL.revokeObjectURL(url);
+  showToast(`${items.length} alerts exported`,'success');
 }
 
-async function addStock(){
-  const typeId=document.getElementById('add-type').value;
-  const size=document.getElementById('add-size').value;
-  const qty=parseInt(document.getElementById('add-qty').value)||0;
-  const minVal=parseInt(document.getElementById('add-min').value)||0;
-  if(!typeId){showToast('Pehle Manage Types mein product type add karo','error');return;}
-  if(qty<=0){showToast('Valid quantity enter karo','error');return;}
-  const existing=allInventory.find(i=>i.product_type_id==typeId&&i.size===size);
-  if(existing){
-    const {error}=await sb.from('inventory').update({stock:existing.stock+qty,...(minVal>0?{min_stock:minVal}:{})}).eq('id',existing.id);
-    if(error){showToast('Error: '+error.message,'error');return;}
-  } else {
-    const typeName=allTypes.find(t=>t.id==typeId)?.name||'';
-    // Generate unique barcode — retry if collision
-    const used=new Set(allInventory.filter(i=>i.barcode).map(i=>i.barcode.toUpperCase()));
-    let barcode,tries=0;
-    do{barcode=genBarcode(typeName,size);tries++;}while(used.has(barcode.toUpperCase())&&tries<15);
-    const {error}=await sb.from('inventory').insert({product_type_id:typeId,size,stock:qty,min_stock:minVal||20,barcode});
-    if(error){showToast('Error: '+error.message,'error');return;}
-  }
-  const typeName=allTypes.find(t=>t.id==typeId)?.name;
-  await logActivity('add',typeName,size,qty,existing?.stock||0,(existing?.stock||0)+qty);
-  await loadInventory();renderStats();renderTable();updateAlertNav();
-  // Reset qty so user doesn't accidentally double-add
-  document.getElementById('add-qty').value='50';
-  showToast(`${qty} pcs added — ${typeName} ${size}`,'success');
-}
-
-function updatePSizes(){
-  const typeId=document.getElementById('ptype')?.value;
-  const sizes=[...new Set(allInventory.filter(i=>i.product_type_id==typeId).map(i=>i.size))];
-  const el=document.getElementById('psize');if(!el)return;
-  el.innerHTML=sizes.map(s=>`<option>${s}</option>`).join('');
-}
-
-async function minusStock(){
-  const typeId=document.getElementById('ptype').value;
-  const size=document.getElementById('psize').value;
-  const qty=parseInt(document.getElementById('pqty').value)||0;
-  if(!typeId){showToast('Product type select karo','error');return;}
-  if(!size){showToast('Is type ke liye koi stock nahi hai','error');return;}
-  if(qty<=0){showToast('Valid quantity enter karo','error');return;}
-  const item=allInventory.find(i=>i.product_type_id==typeId&&i.size===size);
-  if(!item){showToast('Item nahi mila','error');return;}
-  if(item.stock<qty){showToast(`Sirf ${item.stock} pcs available`,'error');return;}
-  const {error}=await sb.from('inventory').update({stock:item.stock-qty}).eq('id',item.id);
-  if(error){showToast('Error: '+error.message,'error');return;}
-  await logActivity('print',item.typeName,size,qty,item.stock,item.stock-qty);
-  await loadInventory();renderStats();renderTable();updateAlertNav();
-  showToast(`${qty} pcs minus — ${item.typeName} ${size}`,'success');
-}
-
-function renderBulkTable(){
-  const sizes=['XS','S','M','L','XL','2XL','3XL'];
-  const el=document.getElementById('bulk-tbl');if(!el)return;
-  if(!allTypes.length||!allInventory.length){
-    el.innerHTML=`<tbody><tr><td style="padding:24px;text-align:center;color:var(--text3);" colspan="${sizes.length+1}">Pehle product types aur stock add karo</td></tr></tbody>`;
+// ─── PRODUCTION LIST (temporary, not saved) ───
+function renderProdList(){
+  const el=document.getElementById('prod-list-rows');
+  if(!el)return;
+  if(!prodList.length){
+    el.innerHTML='<div style="padding:18px;text-align:center;color:var(--text3);font-size:13px;">Koi row nahi. "+ Add Row" ya "Fill from Alerts" use karo.</div>';
     return;
   }
-  el.innerHTML=`<thead><tr><th>Product</th>${sizes.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody>
-    ${allTypes.map(type=>`<tr><td>${type.name}</td>${sizes.map(size=>{
-      const item=allInventory.find(i=>i.product_type_id===type.id&&i.size===size);
-      return item?`<td><input class="bulk-input" type="number" id="blk-${type.id}-${size}" min="0" value="0" title="Avail: ${item.stock}"></td>`:`<td style="text-align:center;color:var(--text3);">—</td>`;
-    }).join('')}</tr>`).join('')}</tbody>`;
+  el.innerHTML=prodList.map((r,idx)=>`
+    <div class="prod-list-row">
+      <select onchange="prodList[${idx}].typeId=this.value">
+        ${allTypes.map(t=>`<option value="${t.id}" ${t.id==r.typeId?'selected':''}>${t.name}</option>`).join('')}
+      </select>
+      <select onchange="prodList[${idx}].size=this.value">
+        ${['XS','S','M','L','XL','2XL','3XL'].map(s=>`<option ${s===r.size?'selected':''}>${s}</option>`).join('')}
+      </select>
+      <input type="number" min="1" value="${r.qty}" oninput="prodList[${idx}].qty=parseInt(this.value)||0">
+      <button class="rm-btn" onclick="prodList.splice(${idx},1);renderProdList();" title="Remove">✕</button>
+    </div>`).join('');
 }
-
-async function doBulkMinus(){
-  const sizes=['XS','S','M','L','XL','2XL','3XL'];
-  let updates=[],total=0,errs=[];
-  allTypes.forEach(type=>{
-    sizes.forEach(size=>{
-      const el=document.getElementById(`blk-${type.id}-${size}`);if(!el)return;
-      const qty=parseInt(el.value)||0;if(qty<=0)return;
-      const item=allInventory.find(i=>i.product_type_id===type.id&&i.size===size);if(!item)return;
-      if(item.stock<qty){errs.push(`${type.name} ${size}: only ${item.stock}`);return;}
-      updates.push({item,qty,type});total+=qty;
-    });
+function addProdListRow(){
+  if(!allTypes.length){showToast('Pehle product types add karo','error');return;}
+  prodList.push({typeId:allTypes[0].id,size:'M',qty:10});
+  renderProdList();
+}
+function clearProdList(){
+  if(!prodList.length)return;
+  if(!confirm('Saara list clear karo?'))return;
+  prodList=[];renderProdList();
+}
+function fillProdListFromAlerts(){
+  const items=getFilteredAlerts();
+  if(!items.length){showToast('Koi alert nahi','error');return;}
+  items.forEach(i=>{
+    const shortage=Math.max(1,i.min_stock-i.stock);
+    // avoid duplicates
+    if(!prodList.some(r=>r.typeId==i.product_type_id&&r.size===i.size)){
+      prodList.push({typeId:i.product_type_id,size:i.size,qty:shortage});
+    }
   });
-  if(errs.length){showToast(errs[0],'error');return;}
-  if(total===0){showToast('Koi qty enter nahi ki','error');return;}
-  for(const u of updates){
-    await sb.from('inventory').update({stock:u.item.stock-u.qty}).eq('id',u.item.id);
-    await logActivity('print',u.type.name,u.item.size,u.qty,u.item.stock,u.item.stock-u.qty);
+  renderProdList();
+  showToast(`${items.length} alerts list mein daal diye`,'success');
+}
+function addToProdListFromAlert(invId){
+  const i=allInventory.find(x=>x.id===invId);if(!i)return;
+  if(prodList.some(r=>r.typeId==i.product_type_id&&r.size===i.size)){
+    showToast('Already list mein hai','error');return;
   }
-  await loadInventory();renderStats();renderTable();updateAlertNav();
-  renderBulkTable(); // reset inputs to 0
-  showToast(`Total ${total} pcs minus`,'success');
+  const shortage=Math.max(1,i.min_stock-i.stock);
+  prodList.push({typeId:i.product_type_id,size:i.size,qty:shortage});
+  renderProdList();
+  showToast('Added to production list','success');
+}
+function printProdList(){
+  if(!prodList.length){showToast('List khaali hai','error');return;}
+  const body=document.getElementById('prodlist-print-body');
+  const dateStr=new Date().toLocaleString('en-IN');
+  body.innerHTML=`
+    <h1>Production List</h1>
+    <div style="color:#555;font-size:12px;">Generated: ${dateStr}</div>
+    <table>
+      <thead><tr><th>#</th><th>Product</th><th>Size</th><th style="text-align:right;">Qty</th></tr></thead>
+      <tbody>
+        ${prodList.map((r,i)=>{
+          const typeName=allTypes.find(t=>t.id==r.typeId)?.name||'?';
+          return `<tr><td>${i+1}</td><td>${typeName}</td><td>${r.size}</td><td style="text-align:right;">${r.qty}</td></tr>`;
+        }).join('')}
+        <tr><td colspan="3" style="text-align:right;font-weight:bold;">TOTAL</td><td style="text-align:right;font-weight:bold;">${prodList.reduce((a,r)=>a+(parseInt(r.qty)||0),0)}</td></tr>
+      </tbody>
+    </table>`;
+  document.getElementById('prodlist-print-view').classList.add('open');
+}
+function closeProdListPrint(){
+  document.getElementById('prodlist-print-view').classList.remove('open');
+}
+function downloadProdListCSV(){
+  if(!prodList.length){showToast('Empty','error');return;}
+  const csv='Product,Size,Qty\n'+prodList.map(r=>{
+    const t=allTypes.find(x=>x.id==r.typeId)?.name||'?';
+    return `"${t}","${r.size}",${r.qty}`;
+  }).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`production_list_${Date.now()}.csv`;a.click();URL.revokeObjectURL(url);
 }
 
 // ============================================================
 // ─── BARCODE SCANNER SYSTEM ───
 // ============================================================
 
-// Batch state
-const scanBatch = {
-  mode: 'add',           // 'add' | 'sub'
-  scans: [],             // [{barcode, item, ts}]
-  recent: [],            // last 20 for display
-  processing: false
-};
-
-// Size codes for barcode generation
+const scanBatch = { mode: 'add', scans: [], recent: [], processing: false };
 const SIZE_CODES = {XS:'XS',S:'S',M:'M',L:'L',XL:'XL','2XL':'2XL','3XL':'3XL'};
 
 function abbrType(name){
-  // "Hoodie" -> "HD", "T-Shirt" -> "TS", "Crop Top" -> "CT"
   const clean=(name||'').replace(/[^a-zA-Z ]/g,'').trim();
   const words=clean.split(/\s+/).filter(Boolean);
   if(words.length>=2) return (words[0][0]+words[1][0]).toUpperCase();
   if(words.length===1){
     const w=words[0];
     if(w.length<=2) return w.toUpperCase();
-    // take first and last consonant-ish
     return (w[0]+w[w.length-1]).toUpperCase();
   }
   return 'XX';
 }
 
-function genBarcode(typeName,size){
-  const pref=abbrType(typeName);
-  const sz=SIZE_CODES[size]||size;
-  const rand=Math.floor(Math.random()*900+100); // 100-999
-  const ts=Date.now().toString(36).slice(-3).toUpperCase();
-  return `${pref}-${sz}-${rand}${ts}`;
-}
-
-// Sound feedback (WebAudio — no external files)
 let audioCtx=null;
 function beep(type='ok'){
   if(!document.getElementById('scan-sound')?.checked) return;
@@ -1169,7 +1409,6 @@ function beep(type='ok'){
     g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+(type==='done'?0.25:0.08));
     o.stop(audioCtx.currentTime+(type==='done'?0.25:0.09));
     if(type==='done'){
-      // second tone
       setTimeout(()=>{
         const o2=audioCtx.createOscillator();const g2=audioCtx.createGain();
         o2.connect(g2);g2.connect(audioCtx.destination);
@@ -1179,7 +1418,6 @@ function beep(type='ok'){
       },130);
     }
   } catch(_){}
-  // mobile vibration
   if(navigator.vibrate){navigator.vibrate(type==='err'?[60,40,60]:30);}
 }
 
@@ -1208,52 +1446,102 @@ function focusScanner(){
 function handleScanInput(barcode){
   barcode=(barcode||'').trim();
   if(!barcode) return;
-  const input=document.getElementById('scan-input');
-  // Helpful check: any barcodes assigned at all?
-  const anyBarcodes=allInventory.some(i=>i.barcode);
-  if(!anyBarcodes){
-    flashInput('err');beep('err');
-    showToast('Pehle Barcodes page pe ja ke barcodes assign karo (Auto-Generate button)','error');
-    return;
-  }
-  const item=allInventory.find(i=>(i.barcode||'').toUpperCase()===barcode.toUpperCase());
-  if(!item){
-    flashInput('err');beep('err');
-    showToast(`Barcode not found: ${barcode}`,'error');
-    return;
-  }
-  // if MINUS mode and no stock (counting pending scans), warn
-  if(scanBatch.mode==='sub'){
-    const pendingMinus=scanBatch.scans.filter(s=>s.item.id===item.id).length;
-    if(item.stock-pendingMinus<=0){
+
+  const pieceKey=barcode.toUpperCase();
+  const piece=piecesMapByBarcode.get(pieceKey);
+  if(piece){
+    if(scanBatch.mode==='add'){
+      if(piece.status==='available'){
+        flashInput('err');beep('err');
+        showToast('Ye piece already stock mein hai (ADD ho chuka)','error');
+        return;
+      }
+      if(piece.status==='used'){
+        flashInput('err');beep('err');
+        showToast('Ye piece already used/dispatched ho chuka','error');
+        return;
+      }
+    } else {
+      if(piece.status==='generated'){
+        flashInput('err');beep('err');
+        showToast('Ye piece abhi stock mein nahi aaya — pehle ADD mode mein scan karo','error');
+        return;
+      }
+      if(piece.status==='used'){
+        flashInput('err');beep('err');
+        showToast('Ye piece already scanned/dispatched ho chuka','error');
+        return;
+      }
+    }
+
+    if(scanBatch.scans.some(s=>s.type==='piece'&&s.barcode.toUpperCase()===pieceKey)){
       flashInput('err');beep('err');
-      showToast(`${item.typeName} ${item.size}: stock khatam (${item.stock} avail, ${pendingMinus} already scanned)`,'error');
+      showToast('Is batch mein ye piece already scanned hai','error');
       return;
     }
+    const invItem=allInventory.find(i=>i.id===piece.inventory_id);
+    if(!invItem){
+      flashInput('err');beep('err');
+      showToast('Piece ka inventory record nahi mila','error');
+      return;
+    }
+    scanBatch.scans.push({
+      type:'piece',
+      barcode:piece.barcode,
+      pieceId:piece.id,
+      pieceStatus:piece.status,
+      item:invItem,
+      ts:Date.now()
+    });
+    scanBatch.recent.unshift({barcode:piece.barcode,item:invItem,ts:Date.now(),type:'piece'});
+    if(scanBatch.recent.length>20) scanBatch.recent.pop();
+    flashInput('ok');beep('ok');
+    renderScanBatch();
+    if(document.getElementById('scan-autoprocess')?.checked && scanBatch.scans.length>=50 && !scanBatch.processing){
+      processScanBatch();
+    }
+    return;
   }
 
-  scanBatch.scans.push({barcode:item.barcode,item,ts:Date.now()});
-  scanBatch.recent.unshift({barcode:item.barcode,item,ts:Date.now()});
-  if(scanBatch.recent.length>20) scanBatch.recent.pop();
-  flashInput('ok');beep('ok');
-  renderScanBatch();
+  checkIfUsedPiece(barcode).then(usedInfo=>{
+    if(usedInfo){
+      showToast(`⚠️ Ye piece already scanned hai! User: ${usedInfo.used_by_email||'—'}, Time: ${new Date(usedInfo.used_at).toLocaleString('en-IN')}`,'error');
+    }
+  });
 
-  // auto-process at 50
-  if(document.getElementById('scan-autoprocess')?.checked && scanBatch.scans.length>=50 && !scanBatch.processing){
-    processScanBatch();
+  flashInput('err');beep('err');
+  showToast(`Barcode not found: ${barcode}`,'error');
+}
+
+async function checkIfUsedPiece(barcode){
+  try {
+    const {data}=await sb.from('pieces').select('barcode,status,used_at,used_by_email').eq('barcode',barcode).maybeSingle();
+    if(data && data.status==='used') return data;
+  } catch(e){}
+  return null;
+}
+
+async function preloadAvailablePieces(){
+  piecesMapByBarcode.clear();
+  let from=0,pageSize=1000,done=false;
+  while(!done){
+    const {data,error}=await sb.from('pieces').select('id,barcode,inventory_id,status').in('status',['generated','available']).range(from,from+pageSize-1);
+    if(error){console.error('preload pieces:',error);break;}
+    (data||[]).forEach(p=>{piecesMapByBarcode.set(p.barcode.toUpperCase(),p);});
+    if(!data||data.length<pageSize){done=true;} else {from+=pageSize;}
+    if(from>100000)break;
   }
 }
 
 function flashInput(type){
   const input=document.getElementById('scan-input');
   input.classList.remove('flash-success','flash-error');
-  void input.offsetWidth; // restart anim
+  void input.offsetWidth;
   input.classList.add(type==='ok'?'flash-success':'flash-error');
 }
 
 function renderScanBatch(){
   document.getElementById('scan-total').textContent=scanBatch.scans.length;
-  // breakdown by sku
   const byItem={};
   scanBatch.scans.forEach(s=>{
     const k=s.item.id;
@@ -1315,29 +1603,50 @@ async function processScanBatch(){
   btn.disabled=true;btn.textContent='Processing...';
 
   try {
-    // group by item
-    const grouped={};
-    scanBatch.scans.forEach(s=>{
-      const k=s.item.id;
-      if(!grouped[k]){grouped[k]={item:s.item,qty:0,barcodes:[]};}
-      grouped[k].qty++;
-      grouped[k].barcodes.push(s.barcode);
-    });
-    const groups=Object.values(grouped);
+    const pieceScans=scanBatch.scans.filter(s=>s.type==='piece');
+    const nowISO=new Date().toISOString();
 
-    // validate stock for MINUS mode
-    if(scanBatch.mode==='sub'){
-      for(const g of groups){
-        if(g.item.stock<g.qty){
-          showToast(`${g.item.typeName} ${g.item.size}: only ${g.item.stock} in stock, scanned ${g.qty}`,'error');
-          scanBatch.processing=false;
-          btn.disabled=false;btn.textContent='✓ Process Batch';
-          return;
+    if(pieceScans.length){
+      const pieceIds=pieceScans.map(s=>s.pieceId);
+
+      if(scanBatch.mode==='add'){
+        const {data:updated,error:updErr}=await sb.from('pieces').update({
+          status:'available',
+          added_at:nowISO,
+          added_by:currentUser.id,
+          added_by_email:currentUser.email
+        }).in('id',pieceIds).eq('status','generated').select('id,barcode,inventory_id');
+        if(updErr)throw new Error('Pieces ADD failed: '+updErr.message);
+        const updatedCount=(updated||[]).length;
+        if(updatedCount<pieceIds.length){
+          const missed=pieceIds.length-updatedCount;
+          throw new Error(`${missed} pieces ka state mismatch (shayad kisi aur ne scan kar diye). Only ${updatedCount} processed.`);
+        }
+      } else {
+        const {data:updated,error:updErr}=await sb.from('pieces').update({
+          status:'used',
+          used_at:nowISO,
+          used_by:currentUser.id,
+          used_by_email:currentUser.email
+        }).in('id',pieceIds).eq('status','available').select('id,barcode,inventory_id');
+        if(updErr)throw new Error('Pieces MINUS failed: '+updErr.message);
+        const updatedCount=(updated||[]).length;
+        if(updatedCount<pieceIds.length){
+          const missed=pieceIds.length-updatedCount;
+          throw new Error(`${missed} pieces already scanned ho chuke the. Only ${updatedCount} processed.`);
         }
       }
+
+      pieceScans.forEach(s=>piecesMapByBarcode.delete(s.barcode.toUpperCase()));
     }
 
-    // Insert scan_logs FIRST (audit trail priority) — if this fails we abort before touching inventory
+    const pieceStockChanges={};
+    pieceScans.forEach(s=>{
+      const k=s.item.id;
+      if(!pieceStockChanges[k]){pieceStockChanges[k]={item:s.item,qty:0};}
+      pieceStockChanges[k].qty++;
+    });
+
     const scanLogRows=scanBatch.scans.map(s=>({
       barcode:s.barcode,
       product_type:s.item.typeName,
@@ -1348,22 +1657,29 @@ async function processScanBatch(){
       inventory_id:s.item.id
     }));
     const {error:logErr}=await sb.from('scan_logs').insert(scanLogRows);
-    if(logErr){throw new Error('Scan log insert failed: '+logErr.message);}
+    if(logErr){console.warn('scan_logs insert warning:',logErr.message);}
 
-    // batch update inventory (one UPDATE per SKU)
-    const invUpdates=groups.map(g=>{
-      const newStock=scanBatch.mode==='add'?g.item.stock+g.qty:g.item.stock-g.qty;
-      return sb.from('inventory').update({stock:newStock}).eq('id',g.item.id);
+    const allStockChanges={};
+    Object.values(pieceStockChanges).forEach(p=>{
+      allStockChanges[p.item.id]=(allStockChanges[p.item.id]||0)+(scanBatch.mode==='add'?p.qty:-p.qty);
+    });
+
+    const invUpdates=Object.entries(allStockChanges).map(([id,delta])=>{
+      const item=allInventory.find(i=>i.id==id);
+      const newStock=Math.max(0,(item?.stock||0)+delta);
+      return sb.from('inventory').update({stock:newStock}).eq('id',id);
     });
     const results=await Promise.all(invUpdates);
     const anyErr=results.find(r=>r.error);
     if(anyErr){throw new Error(anyErr.error.message);}
 
-    // summary activity_log entries per group
-    for(const g of groups){
-      const prev=g.item.stock;
-      const next=scanBatch.mode==='add'?prev+g.qty:prev-g.qty;
-      await logActivity(scanBatch.mode==='add'?'scan-add':'scan-sub',g.item.typeName,g.item.size,g.qty,prev,next);
+    for(const [id,delta] of Object.entries(allStockChanges)){
+      const item=allInventory.find(i=>i.id==id);
+      if(!item)continue;
+      const prev=item.stock;
+      const next=Math.max(0,prev+delta);
+      const action=delta>0?'scan-add':'scan-sub';
+      await logActivity(action,item.typeName,item.size,Math.abs(delta),prev,next);
     }
 
     const total=scanBatch.scans.length;
@@ -1371,7 +1687,8 @@ async function processScanBatch(){
     await loadInventory();renderStats();renderTable();updateAlertNav();
     renderScanBatch();
     beep('done');
-    showToast(`✓ Batch processed — ${total} pcs ${scanBatch.mode==='add'?'added':'minused'}`,'success');
+    const modeLabel=scanBatch.mode==='add'?'added to stock':'dispatched';
+    showToast(`✓ ${total} pcs ${modeLabel}`,'success');
   } catch(e){
     showToast('Error: '+e.message,'error');
     beep('err');
@@ -1382,7 +1699,6 @@ async function processScanBatch(){
   }
 }
 
-// scanner input setup — on Enter, process
 function setupScannerInput(){
   const input=document.getElementById('scan-input');
   if(!input||input.dataset.bound)return;
@@ -1395,77 +1711,15 @@ function setupScannerInput(){
       handleScanInput(val);
     }
   });
-  // keep focus when scanner view is active (but don't fight with other legit inputs)
   input.addEventListener('blur',()=>{
     setTimeout(()=>{
       if(!document.getElementById('view-scanner')?.classList.contains('active'))return;
       if(document.querySelector('.modal-overlay.open'))return;
-      // only refocus if user isn't typing in another input/textarea/select
       const ae=document.activeElement;
       if(ae&&ae!==document.body&&['INPUT','TEXTAREA','SELECT','BUTTON'].includes(ae.tagName))return;
       input.focus();
     },150);
   });
-}
-
-// ─── BARCODES ADMIN VIEW ───
-async function renderBarcodesView(){
-  await loadInventory();
-  document.getElementById('bc-count').textContent=`${allInventory.length} items`;
-  const el=document.getElementById('barcodes-list');
-  if(!allInventory.length){el.innerHTML='<div class="empty-state">No inventory</div>';return;}
-  el.innerHTML=allInventory.map(item=>`
-    <div class="barcode-row">
-      <span style="font-weight:500;">${item.typeName} <span style="color:var(--text3);font-size:12px;">· ${item.size}</span></span>
-      <span style="text-align:center;font-family:'DM Mono',monospace;">${item.stock}</span>
-      <input class="bc-input" id="bc-${item.id}" value="${item.barcode||''}" placeholder="Scan or type...">
-      <div style="display:flex;gap:6px;justify-content:center;">
-        <button class="btn btn-secondary btn-sm" onclick="saveBarcode(${item.id})">Save</button>
-        <button class="btn btn-ghost btn-sm" onclick="regenBarcode(${item.id},'${item.typeName.replace(/'/g,"\\'")}','${item.size}')">↻</button>
-      </div>
-    </div>`).join('');
-}
-
-async function saveBarcode(itemId){
-  const val=document.getElementById('bc-'+itemId).value.trim();
-  if(!val){showToast('Barcode empty nahi ho sakta','error');return;}
-  // check uniqueness locally
-  const dup=allInventory.find(i=>i.id!==itemId&&(i.barcode||'').toUpperCase()===val.toUpperCase());
-  if(dup){showToast(`Already used by ${dup.typeName} ${dup.size}`,'error');return;}
-  const {error}=await sb.from('inventory').update({barcode:val}).eq('id',itemId);
-  if(error){showToast('Error: '+error.message,'error');return;}
-  showToast('Barcode saved','success');
-  await loadInventory();
-}
-
-async function regenBarcode(itemId,typeName,size){
-  // generate unique
-  let tries=0,bc;
-  do {
-    bc=genBarcode(typeName,size);
-    tries++;
-  } while(allInventory.some(i=>(i.barcode||'').toUpperCase()===bc.toUpperCase())&&tries<10);
-  document.getElementById('bc-'+itemId).value=bc;
-  await saveBarcode(itemId);
-  renderBarcodesView();
-}
-
-async function autoGenerateAllBarcodes(){
-  const missing=allInventory.filter(i=>!i.barcode);
-  if(!missing.length){showToast('Sab ke barcodes already hain','success');return;}
-  if(!confirm(`Generate barcodes for ${missing.length} items?`))return;
-  const used=new Set(allInventory.filter(i=>i.barcode).map(i=>i.barcode.toUpperCase()));
-  const updates=[];
-  for(const item of missing){
-    let bc,tries=0;
-    do {bc=genBarcode(item.typeName,item.size);tries++;}
-    while(used.has(bc.toUpperCase())&&tries<15);
-    used.add(bc.toUpperCase());
-    updates.push(sb.from('inventory').update({barcode:bc}).eq('id',item.id));
-  }
-  await Promise.all(updates);
-  showToast(`${missing.length} barcodes generated`,'success');
-  await loadInventory();renderBarcodesView();renderTable();
 }
 
 // ─── WORKER STATS ───
@@ -1477,7 +1731,6 @@ async function renderWorkersView(){
   else if(period==='week'){since=new Date(Date.now()-7*24*3600*1000).toISOString();}
   else if(period==='month'){since=new Date(Date.now()-30*24*3600*1000).toISOString();}
 
-  // Fetch in chunks of 1000 (Supabase default cap) using range pagination
   let all=[], from=0, pageSize=1000, done=false;
   while(!done){
     let q=sb.from('scan_logs').select('*').order('created_at',{ascending:false}).range(from,from+pageSize-1);
@@ -1487,11 +1740,10 @@ async function renderWorkersView(){
     all=all.concat(data||[]);
     if(!data||data.length<pageSize){done=true;}
     else{from+=pageSize;}
-    if(all.length>50000)break; // safety cap
+    if(all.length>50000)break;
   }
   const scans=all;
 
-  // aggregate by user
   const byUser={};
   scans.forEach(l=>{
     const k=l.user_id||'unknown';
@@ -1500,13 +1752,11 @@ async function renderWorkersView(){
     if(l.action==='scan-add') byUser[k].add++; else byUser[k].sub++;
   });
 
-  // fetch profiles for names
   const {data:profiles}=await sb.from('profiles').select('id,name,email');
   const pMap={};(profiles||[]).forEach(p=>pMap[p.id]=p);
   const arr=Object.entries(byUser).map(([id,v])=>({id,name:pMap[id]?.name||v.email,email:v.email,...v}));
   arr.sort((a,b)=>b.total-a.total);
 
-  // top stats
   const totalScans=scans.length;
   const totalAdd=scans.filter(s=>s.action==='scan-add').length;
   const totalSub=scans.filter(s=>s.action==='scan-sub').length;
@@ -1564,22 +1814,170 @@ function updatePreview(){
   const col=editMode==='add'?'var(--green)':(nv<item.min_stock?'var(--red)':'var(--amber)');
   pill.innerHTML=`<span>${item.stock}</span><span style="color:var(--text3);">→</span><span style="color:${col};font-weight:600;">${nv}</span><span style="color:var(--text3);">pcs</span>`;
 }
+// Sync pieces table with manual stock change. delta>0 → insert available pieces (MANUAL-prefix barcode). delta<0 → mark oldest available pieces as used.
+async function syncPiecesForStockChange(invItem, delta){
+  const nowISO=new Date().toISOString();
+  if(delta>0){
+    const qty=delta;
+    const ts=Date.now();
+    const rows=[];
+    for(let i=0;i<qty;i++){
+      const rand=Math.random().toString(36).slice(2,6).toUpperCase();
+      rows.push({
+        barcode:`MANUAL-${invItem.id}-${ts}-${String(i).padStart(4,'0')}-${rand}`,
+        inventory_id:invItem.id,
+        status:'available',
+        added_at:nowISO,
+        added_by:currentUser.id,
+        added_by_email:currentUser.email,
+        created_by:currentUser.id
+      });
+    }
+    for(let i=0;i<rows.length;i+=500){
+      const {error}=await sb.from('pieces').insert(rows.slice(i,i+500));
+      if(error)throw new Error('Pieces insert fail: '+error.message);
+    }
+  } else if(delta<0){
+    const need=-delta;
+    const {data:avail,error:selErr}=await sb.from('pieces')
+      .select('id')
+      .eq('inventory_id',invItem.id)
+      .eq('status','available')
+      .order('added_at',{ascending:true,nullsFirst:true})
+      .order('id',{ascending:true})
+      .limit(need);
+    if(selErr)throw new Error('Pieces fetch fail: '+selErr.message);
+    if(!avail||avail.length<need){
+      throw new Error(`Pieces table mein sirf ${avail?.length||0} available hain, ${need} chahiye. Mismatch hai — pehle pieces table check karo.`);
+    }
+    const ids=avail.map(p=>p.id);
+    for(let i=0;i<ids.length;i+=500){
+      const chunk=ids.slice(i,i+500);
+      const {error:upErr}=await sb.from('pieces').update({
+        status:'used',
+        used_at:nowISO,
+        used_by:currentUser.id,
+        used_by_email:currentUser.email
+      }).in('id',chunk).eq('status','available');
+      if(upErr)throw new Error('Pieces update fail: '+upErr.message);
+    }
+  }
+}
+
 async function confirmEdit(){
   const item=allInventory.find(i=>i.id===editItemId);if(!item)return;
   const qty=parseInt(document.getElementById('modal-qty').value)||0;
   if(qty<=0){showToast('Valid quantity','error');return;}
   const old=item.stock;
-  let newStock=editMode==='add'?old+qty:old-qty;
+  const delta=editMode==='add'?qty:-qty;
+  const newStock=old+delta;
   if(editMode==='sub'&&qty>old){showToast(`Only ${old} pcs available`,'error');return;}
-  const {error}=await sb.from('inventory').update({stock:newStock}).eq('id',item.id);
-  if(error){showToast('Error: '+error.message,'error');return;}
-  await logActivity(editMode==='add'?'update-add':'update-sub',item.typeName,item.size,qty,old,newStock);
-  await loadInventory();renderStats();renderTable();updateAlertNav();
-  closeModal('edit-modal');
-  showToast(`Stock updated — ${item.typeName} ${item.size} (${old}→${newStock})`,'success');
+  const btn=document.getElementById('modal-confirm-btn');
+  btn.disabled=true;const oldText=btn.textContent;btn.textContent='Syncing...';
+  try {
+    await syncPiecesForStockChange(item,delta);
+    const {error}=await sb.from('inventory').update({stock:newStock}).eq('id',item.id);
+    if(error)throw new Error(error.message);
+    await logActivity(editMode==='add'?'update-add':'update-sub',item.typeName,item.size,qty,old,newStock);
+    await loadInventory();renderStats();renderTable();updateAlertNav();
+    closeModal('edit-modal');
+    showToast(`Stock updated — ${item.typeName} ${item.size} (${old}→${newStock})`,'success');
+  } catch(err){
+    showToast('Error: '+err.message,'error');
+  } finally {
+    btn.disabled=false;btn.textContent=oldText;
+  }
 }
 
-// ─── MIN STOCK / TYPES / USERS / LOG (unchanged) ───
+// ─── BULK EDIT ───
+let bulkEditValues={}; // {invId: newStockNumber}
+function openBulkEditModal(){
+  const role=currentProfile?.role||'viewer';
+  if(!['admin','manager'].includes(role)){showToast('Permission denied','error');return;}
+  bulkEditValues={};
+  document.getElementById('bulk-search').value='';
+  renderBulkEditRows();
+  document.getElementById('bulk-edit-modal').classList.add('open');
+}
+function renderBulkEditRows(){
+  const q=(document.getElementById('bulk-search')?.value||'').toLowerCase().trim();
+  const items=q?allInventory.filter(i=>i.typeName.toLowerCase().includes(q)||i.size.toLowerCase().includes(q)):allInventory;
+  const tbody=document.getElementById('bulk-edit-tbody');
+  if(!items.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No items</td></tr>';updateBulkChangedCount();return;}
+  tbody.innerHTML=items.map(item=>{
+    const curVal=bulkEditValues[item.id];
+    const hasVal=curVal!==undefined&&curVal!==null&&curVal!=='';
+    const delta=hasVal?(parseInt(curVal)-item.stock):0;
+    const deltaStr=hasVal?(delta>0?`<span style="color:var(--green);">+${delta}</span>`:delta<0?`<span style="color:var(--red);">${delta}</span>`:'<span style="color:var(--text3);">0</span>'):'<span style="color:var(--text3);">—</span>';
+    return `<tr>
+      <td style="font-weight:500;">${item.typeName}</td>
+      <td><span class="size-pill">${item.size}</span></td>
+      <td class="cell-mono" style="text-align:right;">${item.stock}</td>
+      <td style="text-align:center;"><input type="number" min="0" class="bulk-new-input" data-id="${item.id}" value="${hasVal?curVal:''}" placeholder="—" oninput="setBulkVal(${item.id},this.value)" style="width:90px;padding:6px 10px;text-align:center;background:var(--bg2);border:1px solid var(--bd1);border-radius:6px;color:var(--text1);font-family:'DM Mono',monospace;"></td>
+      <td style="text-align:center;font-family:'DM Mono',monospace;">${deltaStr}</td>
+    </tr>`;
+  }).join('');
+  updateBulkChangedCount();
+}
+function setBulkVal(id,val){
+  if(val===''||val===null){delete bulkEditValues[id];}
+  else {const n=parseInt(val);if(!isNaN(n)&&n>=0)bulkEditValues[id]=n;}
+  // only re-render delta cell — cheap enough to re-render all
+  renderBulkEditRows();
+  // restore focus
+  const inp=document.querySelector(`.bulk-new-input[data-id="${id}"]`);
+  if(inp){inp.focus();const len=inp.value.length;inp.setSelectionRange(len,len);}
+}
+function updateBulkChangedCount(){
+  const changed=Object.keys(bulkEditValues).filter(k=>{
+    const item=allInventory.find(i=>i.id==k);
+    return item&&bulkEditValues[k]!==item.stock;
+  }).length;
+  const el=document.getElementById('bulk-changed-count');
+  if(el)el.textContent=changed?`${changed} item${changed>1?'s':''} changed`:'';
+}
+function clearBulkEdits(){
+  bulkEditValues={};
+  renderBulkEditRows();
+}
+async function applyBulkEdit(){
+  const changes=[];
+  Object.keys(bulkEditValues).forEach(k=>{
+    const item=allInventory.find(i=>i.id==k);
+    if(!item)return;
+    const newStock=bulkEditValues[k];
+    if(newStock===item.stock)return;
+    changes.push({item,newStock,delta:newStock-item.stock});
+  });
+  if(!changes.length){showToast('Koi changes nahi hain','error');return;}
+  if(!confirm(`${changes.length} item${changes.length>1?'s':''} update karne hain. Confirm?\n\n(Pieces table bhi auto-sync hoga.)`))return;
+  const btn=document.getElementById('bulk-apply-btn');
+  btn.disabled=true;const oldText=btn.textContent;
+  let done=0,failed=[];
+  for(const c of changes){
+    btn.textContent=`Processing ${done+1}/${changes.length}...`;
+    try {
+      await syncPiecesForStockChange(c.item,c.delta);
+      const {error}=await sb.from('inventory').update({stock:c.newStock}).eq('id',c.item.id);
+      if(error)throw new Error(error.message);
+      await logActivity(c.delta>0?'update-add':'update-sub',c.item.typeName,c.item.size,Math.abs(c.delta),c.item.stock,c.newStock);
+      done++;
+    } catch(err){
+      failed.push(`${c.item.typeName} ${c.item.size}: ${err.message}`);
+    }
+  }
+  btn.disabled=false;btn.textContent=oldText;
+  await loadInventory();renderStats();renderTable();updateAlertNav();
+  if(failed.length){
+    showToast(`${done} done, ${failed.length} failed`,'error');
+    alert('Failed items:\n\n'+failed.join('\n'));
+  } else {
+    showToast(`${done} items updated ✓`,'success');
+    closeModal('bulk-edit-modal');
+  }
+}
+
+// ─── MIN STOCK ───
 function renderMinList(){
   const el=document.getElementById('min-list');
   if(!allInventory.length){el.innerHTML='<div class="empty-state">No items</div>';return;}
@@ -1603,6 +2001,7 @@ async function saveAllMin(){
   showToast('Min stock saved','success');
 }
 
+// ─── TYPES (with search) ───
 async function addProductType(){
   const name=document.getElementById('new-type-name').value.trim();
   if(!name){showToast('Type name enter karo','error');return;}
@@ -1614,9 +2013,12 @@ async function addProductType(){
 }
 async function renderTypesListView(){
   await loadTypes();
+  const q=(document.getElementById('types-search')?.value||'').toLowerCase().trim();
+  const filtered=q?allTypes.filter(t=>t.name.toLowerCase().includes(q)):allTypes;
+  document.getElementById('types-count').textContent=`${filtered.length} of ${allTypes.length}`;
   const el=document.getElementById('types-list');
-  if(!allTypes.length){el.innerHTML='<div class="empty-state">No types</div>';return;}
-  el.innerHTML=allTypes.map(type=>{
+  if(!filtered.length){el.innerHTML=`<div class="empty-state">${q?'Koi type match nahi hua':'No types'}</div>`;return;}
+  el.innerHTML=filtered.map(type=>{
     const count=allInventory.filter(i=>i.product_type_id===type.id).length;
     return `<div class="type-item" id="type-row-${type.id}">
       <span class="type-name">${type.name}</span>
@@ -1659,6 +2061,7 @@ async function confirmDelete(){
   await loadAll();renderTypesListView();
 }
 
+// ─── USERS ───
 async function renderUsersView(){
   const {data}=await sb.from('profiles').select('*').order('created_at');
   const users=data||[];
@@ -1670,7 +2073,7 @@ async function renderUsersView(){
       <td style="color:var(--text2);">${u.email}</td>
       <td><span class="role-badge role-${u.role}">${u.role}</span></td>
       <td style="color:var(--text3);font-size:12px;">${new Date(u.created_at).toLocaleDateString('en-IN')}</td>
-      <td>${u.id!==currentUser.id?`<button class="btn btn-secondary btn-sm" onclick="openRoleModal('${u.id}','${u.name||u.email}','${u.role}')">Change Role</button>`:'<span style="font-size:12px;color:var(--text3);">You</span>'}</td>
+      <td>${u.id!==currentUser.id?`<button class="btn btn-secondary btn-sm" onclick="openRoleModal('${u.id}','${(u.name||u.email).replace(/'/g,"\\'")}','${u.role}')">Change Role</button>`:'<span style="font-size:12px;color:var(--text3);">You</span>'}</td>
     </tr>`).join('')}
   </tbody></table>`;
 }
@@ -1703,8 +2106,117 @@ async function logActivity(action,type,size,qty,prev,next){
   });
 }
 
+// ─── HISTORY (with user filter for admin) ───
+async function populateLogUserFilter(){
+  const sel=document.getElementById('log-user-filter');
+  if(!sel)return;
+  const cur=sel.value;
+  const {data}=await sb.from('profiles').select('id,name,email').order('name');
+  sel.innerHTML='<option value="">All users</option>'+(data||[]).map(u=>`<option value="${u.email}" ${u.email===cur?'selected':''}>${u.name||u.email}</option>`).join('');
+}
+
+function populateLogDelUserFilter(){
+  const sel=document.getElementById('log-del-user');
+  if(!sel)return;
+  const src=document.getElementById('log-user-filter');
+  if(src)sel.innerHTML=src.innerHTML;
+}
+
+function getDeleteHistoryQuery(){
+  const from=document.getElementById('log-del-from').value;
+  const to=document.getElementById('log-del-to').value;
+  const user=document.getElementById('log-del-user').value;
+  if(!from||!to)return {error:'From aur To dono dates select karo'};
+  const fromISO=new Date(from).toISOString();
+  const toISO=new Date(to).toISOString();
+  if(new Date(from)>=new Date(to))return {error:'From date To date se pehle honi chahiye'};
+  return {fromISO,toISO,user,fromLabel:new Date(from).toLocaleString('en-IN'),toLabel:new Date(to).toLocaleString('en-IN')};
+}
+
+async function previewDeleteHistory(){
+  const cfg=getDeleteHistoryQuery();
+  const el=document.getElementById('log-del-preview');
+  if(cfg.error){el.textContent='⚠ '+cfg.error;el.style.color='var(--red)';return;}
+  let q=sb.from('activity_log').select('*',{count:'exact',head:true}).gte('created_at',cfg.fromISO).lte('created_at',cfg.toISO);
+  if(cfg.user)q=q.eq('user_email',cfg.user);
+  const {count,error}=await q;
+  if(error){el.textContent='Error: '+error.message;el.style.color='var(--red)';return;}
+  el.textContent=`→ ${count||0} entries will be deleted`;
+  el.style.color=(count||0)>0?'var(--amber)':'var(--text3)';
+}
+
+async function deleteHistoryRange(){
+  if(currentProfile?.role!=='admin'){showToast('Admin only','error');return;}
+  const cfg=getDeleteHistoryQuery();
+  if(cfg.error){showToast(cfg.error,'error');return;}
+  let q=sb.from('activity_log').select('*',{count:'exact',head:true}).gte('created_at',cfg.fromISO).lte('created_at',cfg.toISO);
+  if(cfg.user)q=q.eq('user_email',cfg.user);
+  const {count}=await q;
+  if(!count){showToast('Is range mein koi log nahi hai','error');return;}
+  const userPart=cfg.user?`\nUser: ${cfg.user}`:'\nUser: All';
+  const msg=`⚠ ${count} activity log entries DELETE karne hain?\n\nFrom: ${cfg.fromLabel}\nTo: ${cfg.toLabel}${userPart}\n\nYe undo NAHI hoga. Confirm karne ke liye "DELETE" type karo:`;
+  const input=prompt(msg);
+  if(input!=='DELETE'){showToast('Cancelled','error');return;}
+  let delQ=sb.from('activity_log').delete().gte('created_at',cfg.fromISO).lte('created_at',cfg.toISO);
+  if(cfg.user)delQ=delQ.eq('user_email',cfg.user);
+  const {error}=await delQ;
+  if(error){showToast('Error: '+error.message,'error');return;}
+  showToast(`${count} log entries deleted`,'success');
+  document.getElementById('log-del-preview').textContent='';
+  renderLogView();
+}
+
+async function fullSystemReset(){
+  if(currentProfile?.role!=='admin'){showToast('Admin only','error');return;}
+  const msg1=`💣 FULL SYSTEM RESET\n\nYe saare changes honge:\n• Saari activity history delete\n• Saare pieces delete (generated + available + used)\n• Saari inventory stock = 0\n\nProduct types aur users safe rahenge.\n\nConfirm karne ke liye "RESET" type karo:`;
+  const input=prompt(msg1);
+  if(input!=='RESET'){showToast('Cancelled','error');return;}
+  if(!confirm('Pakka? Ye undo NAHI hoga. Last chance — Reset karein?'))return;
+
+  const btn=event?.target;
+  if(btn){btn.disabled=true;btn.textContent='Resetting...';}
+  try {
+    // 1. Delete all pieces
+    const {error:pErr}=await sb.from('pieces').delete().gte('id',0);
+    if(pErr&&!pErr.message.includes('0 rows'))throw new Error('Pieces delete: '+pErr.message);
+
+    // 2. Reset inventory stock to 0
+    const {error:iErr}=await sb.from('inventory').update({stock:0}).gte('id',0);
+    if(iErr)throw new Error('Inventory reset: '+iErr.message);
+
+    // 3. Delete all activity_log
+    const {error:lErr}=await sb.from('activity_log').delete().gte('id',0);
+    if(lErr&&!lErr.message.includes('0 rows'))throw new Error('Log delete: '+lErr.message);
+
+    // 4. Delete all scan_logs if table used
+    try {await sb.from('scan_logs').delete().gte('id',0);} catch(e){}
+
+    await loadInventory();renderStats();renderTable();updateAlertNav();renderLogView();
+    showToast('System reset complete ✓','success');
+    alert('✓ Full reset done.\n\nPieces: 0\nInventory stock: 0\nActivity log: cleared');
+  } catch(err){
+    showToast('Reset failed: '+err.message,'error');
+  } finally {
+    if(btn){btn.disabled=false;btn.textContent='💣 Reset Everything';}
+  }
+}
+
 async function renderLogView(){
-  const {data}=await sb.from('activity_log').select('*').order('created_at',{ascending:false}).limit(100);
+  const isAdmin=currentProfile?.role==='admin';
+  const panel=document.getElementById('log-filters-panel');
+  if(panel)panel.style.display=isAdmin?'block':'none';
+  const danger=document.getElementById('log-danger-panel');
+  if(danger)danger.style.display=isAdmin?'block':'none';
+  if(isAdmin){await populateLogUserFilter();populateLogDelUserFilter();}
+
+  const userF=isAdmin?(document.getElementById('log-user-filter')?.value||''):'';
+  const actionF=isAdmin?(document.getElementById('log-action-filter')?.value||''):'';
+
+  let q=sb.from('activity_log').select('*').order('created_at',{ascending:false}).limit(200);
+  if(userF) q=q.eq('user_email',userF);
+  if(actionF) q=q.eq('action',actionF);
+
+  const {data}=await q;
   const logs=data||[];
   document.getElementById('log-count').textContent=`${logs.length} entries`;
   if(!logs.length){document.getElementById('log-list').innerHTML='<div class="empty-state">No activity</div>';return;}
@@ -1732,15 +2244,596 @@ async function renderLogView(){
   }).join('');
 }
 
-// ─── NAVIGATION ───
+// ============================================================
+// ─── PIECE-LEVEL BARCODES ───
+// ============================================================
+
+function refreshGenDropdowns(){
+  const el=document.getElementById('gen-type');if(!el)return;
+  const cur=el.value;
+  el.innerHTML=allTypes.map(t=>`<option value="${t.id}" ${t.id==cur?'selected':''}>${t.name}</option>`).join('');
+  updateGenSizes();
+}
+
+function updateGenSizes(){
+  const sizes=['XS','S','M','L','XL','2XL','3XL'];
+  const el=document.getElementById('gen-size');if(!el)return;
+  el.innerHTML=sizes.map(s=>`<option${s==='M'?' selected':''}>${s}</option>`).join('');
+  updateGenSample();
+}
+
+function updateGenSample(){
+  const typeId=document.getElementById('gen-type')?.value;
+  const size=document.getElementById('gen-size')?.value||'M';
+  const typeName=allTypes.find(t=>t.id==typeId)?.name||'Hoodie';
+  const el=document.getElementById('gen-sample');
+  if(el){
+    const pref=abbrType(typeName);
+    el.textContent=`${pref}-${size}-000001-A7K9`;
+  }
+}
+
+function genPieceBarcode(typeName,size,seq){
+  const pref=abbrType(typeName);
+  const seqStr=String(seq).padStart(6,'0');
+  const rand=Math.random().toString(36).slice(2,6).toUpperCase();
+  return `${pref}-${size}-${seqStr}-${rand}`;
+}
+
+async function generatePieces(){
+  const typeId=document.getElementById('gen-type').value;
+  const size=document.getElementById('gen-size').value;
+  const qty=parseInt(document.getElementById('gen-qty').value)||0;
+  if(!typeId){showToast('Product type select karo','error');return;}
+  if(qty<=0||qty>5000){showToast('Quantity 1-5000 ke beech hona chahiye','error');return;}
+
+  const typeName=allTypes.find(t=>t.id==typeId)?.name;
+  if(!confirm(`Generate ${qty} unique barcodes for ${typeName} ${size}?\n\nNote: Stock abhi NAHI badhega — piece tab stock mein aayega jab ADD mode mein scan karoge.`))return;
+
+  const resultEl=document.getElementById('gen-result');
+  resultEl.innerHTML=`<div class="loader"><div class="spinner"></div> Generating ${qty} barcodes...</div>`;
+
+  try {
+    let invItem=allInventory.find(i=>i.product_type_id==typeId&&i.size===size);
+    if(!invItem){
+      const {data:newInv,error:invErr}=await sb.from('inventory').insert({
+        product_type_id:typeId,size,stock:0,min_stock:20,
+        barcode:`${abbrType(typeName)}-${size}-SKU-${Math.random().toString(36).slice(2,6).toUpperCase()}`
+      }).select('*, product_types(name)').single();
+      if(invErr)throw new Error('Inventory create: '+invErr.message);
+      invItem={...newInv,typeName};
+      allInventory.push(invItem);
+    }
+
+    const {data:existing}=await sb.from('pieces').select('barcode').eq('inventory_id',invItem.id).order('id',{ascending:false}).limit(1);
+    let startSeq=1;
+    if(existing&&existing.length){
+      const m=existing[0].barcode.match(/-(\d{6})-/);
+      if(m)startSeq=parseInt(m[1])+1;
+    }
+
+    const rows=[];
+    const generated=[];
+    for(let i=0;i<qty;i++){
+      const bc=genPieceBarcode(typeName,size,startSeq+i);
+      rows.push({
+        barcode:bc,
+        inventory_id:invItem.id,
+        status:'generated',
+        created_by:currentUser.id
+      });
+      generated.push({barcode:bc,typeName,size});
+    }
+
+    let inserted=0;
+    for(let i=0;i<rows.length;i+=500){
+      const chunk=rows.slice(i,i+500);
+      const {error:insErr}=await sb.from('pieces').insert(chunk);
+      if(insErr)throw new Error('Piece insert: '+insErr.message);
+      inserted+=chunk.length;
+      resultEl.innerHTML=`<div class="loader"><div class="spinner"></div> Inserted ${inserted}/${qty}...</div>`;
+    }
+
+    lastGeneratedPieces=generated;
+
+    resultEl.innerHTML=`
+      <div style="background:var(--green-bg);border:1px solid rgba(61,214,140,0.2);border-radius:var(--radius);padding:14px 18px;margin-bottom:14px;">
+        <div style="color:var(--green);font-weight:600;margin-bottom:4px;">✓ ${qty} barcodes generated successfully</div>
+        <div style="font-size:12px;color:var(--text2);">${typeName} · ${size} · Status: <b style="color:var(--amber);">Generated</b> (not in stock yet)</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">Ab stickers print karo aur pieces pe chipkao. Phir Scanner → ADD mode mein scan karo stock mein laane ke liye.</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" style="width:auto;" onclick="openPrintLabelsForLastBatch()">🏷 Print Labels (${qty})</button>
+        <button class="btn btn-secondary" onclick="downloadBarcodesCSV()">↓ Download CSV</button>
+        <button class="btn btn-ghost" onclick="switchView('pieces')">Browse All Pieces</button>
+        <button class="btn btn-danger" style="margin-left:auto;" onclick="deleteLastBatch()">🗑 Delete This Batch</button>
+      </div>
+      <div class="batch-list" style="margin-top:14px;">
+        ${generated.slice(0,20).map(p=>`<div class="batch-row"><span class="piece-pill">${p.barcode}</span><span style="color:var(--text3);font-size:12px;">${p.typeName} · ${p.size}</span></div>`).join('')}
+        ${generated.length>20?`<div class="batch-row" style="justify-content:center;color:var(--text3);font-size:12px;">...and ${generated.length-20} more</div>`:''}
+      </div>`;
+    showToast(`${qty} barcodes generated — ${typeName} ${size}`,'success');
+  } catch(e){
+    resultEl.innerHTML=`<div style="background:var(--red-bg);border:1px solid rgba(255,107,107,0.2);border-radius:var(--radius);padding:14px;color:var(--red);">Error: ${e.message}</div>`;
+  }
+}
+
+function downloadBarcodesCSV(){
+  if(!lastGeneratedPieces.length){showToast('Kuch nahi hai','error');return;}
+  const csv='Barcode,Product,Size\n'+lastGeneratedPieces.map(p=>`"${p.barcode}","${p.typeName}","${p.size}"`).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`pieces_${Date.now()}.csv`;
+  a.click();URL.revokeObjectURL(url);
+}
+
+async function deleteLastBatch(){
+  if(!lastGeneratedPieces.length){showToast('Koi recent batch nahi hai','error');return;}
+  const qty=lastGeneratedPieces.length;
+  const firstCode=lastGeneratedPieces[0].barcode;
+  const lastCode=lastGeneratedPieces[qty-1].barcode;
+  if(!confirm(`Last batch delete karo?\n\n${qty} pieces (${firstCode} se ${lastCode})\n\nYe action undo nahi ho sakta.\n\nSirf 'Generated' state wale delete honge — agar koi piece already ADD scan ho chuka hai toh wo safe rahega.`))return;
+
+  try {
+    const barcodes=lastGeneratedPieces.map(p=>p.barcode);
+    let deleted=0;
+    for(let i=0;i<barcodes.length;i+=500){
+      const chunk=barcodes.slice(i,i+500);
+      const {error,count}=await sb.from('pieces').delete({count:'exact'}).in('barcode',chunk).eq('status','generated');
+      if(error)throw error;
+      deleted+=count||chunk.length;
+    }
+    const skipped=qty-deleted;
+    lastGeneratedPieces=[];
+    document.getElementById('gen-result').innerHTML=`
+      <div style="background:var(--green-bg);border:1px solid rgba(61,214,140,0.2);border-radius:var(--radius);padding:14px 18px;">
+        <div style="color:var(--green);font-weight:600;">✓ ${deleted} pieces deleted</div>
+        ${skipped>0?`<div style="font-size:12px;color:var(--amber);margin-top:4px;">⚠️ ${skipped} pieces skip hue (already scanned/in stock)</div>`:''}
+      </div>`;
+    showToast(`${deleted} pieces deleted`,'success');
+  } catch(e) {
+    showToast('Error: '+e.message,'error');
+  }
+}
+
+// ─── BROWSE PIECES (paginated + multi-page selection) ───
+let piecesPage=1;
+let piecesPageSize=100;
+let piecesTotalCount=0;
+let selectedPieceIds=new Set();
+let selectedPieceData=new Map(); // id → {barcode, typeName, size, status, ...}
+
+function refreshPieceFilterDropdowns(){
+  const el=document.getElementById('pc-filter-type');if(!el)return;
+  const cur=el.value;
+  el.innerHTML=`<option value="">All products</option>`+
+    allTypes.map(t=>`<option value="${t.id}" ${t.id==cur?'selected':''}>${t.name}</option>`).join('');
+}
+
+function setPieceStatusFilter(status){
+  const sel=document.getElementById('pc-filter-status');
+  if(sel){sel.value=status;piecesPage=1;renderPiecesView();}
+}
+
+function piecesGetFilters(){
+  const typeFilter=document.getElementById('pc-filter-type')?.value||'';
+  const sizeFilter=document.getElementById('pc-filter-size')?.value||'';
+  const searchTerm=(document.getElementById('pc-filter-search')?.value||'').trim().toUpperCase();
+  const statusFilter=document.getElementById('pc-filter-status')?.value||'';
+  let invIds=null;
+  if(typeFilter||sizeFilter){
+    invIds=allInventory.filter(i=>{
+      if(typeFilter&&i.product_type_id!=typeFilter)return false;
+      if(sizeFilter&&i.size!==sizeFilter)return false;
+      return true;
+    }).map(i=>i.id);
+  }
+  return {typeFilter,sizeFilter,searchTerm,statusFilter,invIds};
+}
+
+function piecesApplyFilters(q, filters, withStatus){
+  if(filters.invIds!==null){
+    if(!filters.invIds.length)return null;
+    q=q.in('inventory_id',filters.invIds);
+  }
+  if(filters.searchTerm)q=q.ilike('barcode',`%${filters.searchTerm}%`);
+  if(withStatus&&filters.statusFilter)q=q.eq('status',filters.statusFilter);
+  return q;
+}
+
+function onPiecesFilterChange(){piecesPage=1;renderPiecesView();}
+function changePiecesPageSize(sz){piecesPageSize=parseInt(sz)||100;piecesPage=1;renderPiecesView();}
+function gotoPiecesPage(n){const totalPages=Math.max(1,Math.ceil(piecesTotalCount/piecesPageSize));piecesPage=Math.max(1,Math.min(totalPages,n));renderPiecesView();}
+
+async function renderPiecesView(){
+  const filters=piecesGetFilters();
+  const el=document.getElementById('pieces-list');
+  el.innerHTML='<div class="loader"><div class="spinner"></div> Loading pieces...</div>';
+  document.getElementById('pc-pagination').style.display='none';
+
+  if(filters.invIds!==null && !filters.invIds.length){
+    el.innerHTML='<div class="empty-state">No pieces for selected filter</div>';
+    document.getElementById('pieces-stats').innerHTML='';
+    document.getElementById('pc-count').textContent='0 pieces';
+    updateSelectionUI();
+    return;
+  }
+
+  // Stats: count per status under type/size/search filters (ignoring status filter)
+  const statsReq=(status)=>{
+    const q=sb.from('pieces').select('*',{count:'exact',head:true});
+    return piecesApplyFilters(q,{...filters,statusFilter:status},true);
+  };
+  let genCount=0,avlCount=0,usdCount=0;
+  try {
+    const [gR,aR,uR]=await Promise.all([statsReq('generated'),statsReq('available'),statsReq('used')]);
+    const [gRes,aRes,uRes]=await Promise.all([gR,aR,uR]);
+    genCount=gRes.count||0;avlCount=aRes.count||0;usdCount=uRes.count||0;
+  } catch(e){/* ignore */}
+  const totalAll=genCount+avlCount+usdCount;
+
+  const curStatus=filters.statusFilter||'';
+  const activeCls=(v)=>curStatus===v?'active-filter':'';
+  document.getElementById('pieces-stats').innerHTML=`
+    <div class="stat-card c-blue clickable ${activeCls('')}" onclick="setPieceStatusFilter('')" title="Show all"><div class="stat-icon">📦</div><div class="stat-label">Showing</div><div class="stat-value">${totalAll}</div></div>
+    <div class="stat-card c-amber clickable ${activeCls('generated')}" onclick="setPieceStatusFilter('generated')" title="Only Generated"><div class="stat-icon">🏷</div><div class="stat-label">Generated</div><div class="stat-value amber">${genCount}</div></div>
+    <div class="stat-card c-green clickable ${activeCls('available')}" onclick="setPieceStatusFilter('available')" title="Only In Stock"><div class="stat-icon">✓</div><div class="stat-label">In Stock</div><div class="stat-value green">${avlCount}</div></div>
+    <div class="stat-card c-red clickable ${activeCls('used')}" onclick="setPieceStatusFilter('used')" title="Only Used"><div class="stat-icon">✗</div><div class="stat-label">Used</div><div class="stat-value red">${usdCount}</div></div>`;
+
+  // Fetch current page
+  let pageQ=sb.from('pieces').select('*',{count:'exact'}).order('created_at',{ascending:false});
+  pageQ=piecesApplyFilters(pageQ,filters,true);
+  const from=(piecesPage-1)*piecesPageSize;
+  const to=from+piecesPageSize-1;
+  pageQ=pageQ.range(from,to);
+
+  const {data,count:filteredCount,error}=await pageQ;
+  if(error){el.innerHTML='<div class="empty-state">Error: '+error.message+'</div>';return;}
+  piecesCache=data||[];
+  piecesTotalCount=filteredCount||0;
+
+  const totalPages=Math.max(1,Math.ceil(piecesTotalCount/piecesPageSize));
+  if(piecesPage>totalPages){piecesPage=totalPages;return renderPiecesView();}
+
+  document.getElementById('pc-count').textContent=`${piecesTotalCount} pieces (page ${piecesPage}/${totalPages})`;
+
+  const bulkBtn=document.getElementById('pc-bulk-delete');
+  if(bulkBtn){
+    if(genCount>0&&currentProfile?.role==='admin'){
+      bulkBtn.style.display='';
+      bulkBtn.textContent=`🗑 Delete ${genCount} Generated`;
+    } else {
+      bulkBtn.style.display='none';
+    }
+  }
+
+  if(!piecesTotalCount){el.innerHTML='<div class="empty-state">No pieces match filters</div>';updateSelectionUI();return;}
+
+  const statusPill=(s)=>{
+    if(s==='generated')return'<span class="piece-status-gen">Generated</span>';
+    if(s==='available')return'<span class="piece-status-avail">In Stock</span>';
+    if(s==='used')return'<span class="piece-status-used">Used</span>';
+    return s;
+  };
+  const isAdmin=currentProfile?.role==='admin';
+
+  el.innerHTML=`<table><thead><tr>
+    <th style="width:36px;text-align:center;"><input type="checkbox" id="pc-select-all-page" onchange="toggleSelectAllOnPage(this.checked)"></th>
+    <th>Barcode</th><th>Product</th><th>Size</th><th>Status</th><th>Generated</th><th>Added</th><th>Used</th>${isAdmin?'<th></th>':''}</tr></thead><tbody>
+    ${piecesCache.map(p=>{
+      const inv=allInventory.find(i=>i.id===p.inventory_id);
+      const canDelete=isAdmin&&p.status==='generated';
+      const checked=selectedPieceIds.has(p.id)?'checked':'';
+      return `<tr>
+        <td style="text-align:center;"><input type="checkbox" class="pc-row-check" data-id="${p.id}" ${checked} onchange="togglePieceSelection(${p.id},this.checked)"></td>
+        <td><span class="piece-pill">${p.barcode}</span></td>
+        <td style="font-weight:500;">${inv?.typeName||'—'}</td>
+        <td><span class="size-pill">${inv?.size||'—'}</span></td>
+        <td>${statusPill(p.status)}</td>
+        <td style="color:var(--text3);font-size:12px;">${new Date(p.created_at).toLocaleString('en-IN',{dateStyle:'short',timeStyle:'short'})}</td>
+        <td style="color:var(--text3);font-size:12px;">${p.added_at?new Date(p.added_at).toLocaleString('en-IN',{dateStyle:'short',timeStyle:'short'})+'<br><span style="font-size:10px;">'+(p.added_by_email||'')+'</span>':'—'}</td>
+        <td style="color:var(--text3);font-size:12px;">${p.used_at?new Date(p.used_at).toLocaleString('en-IN',{dateStyle:'short',timeStyle:'short'})+'<br><span style="font-size:10px;">'+(p.used_by_email||'')+'</span>':'—'}</td>
+        ${isAdmin?`<td>${canDelete?`<button class="btn btn-danger btn-sm" onclick="deleteSinglePiece(${p.id},'${p.barcode}')">🗑</button>`:'<span style="font-size:11px;color:var(--text3);" title="Sirf Generated pieces delete ho sakte hain">—</span>'}</td>`:''}
+      </tr>`;
+    }).join('')}
+  </tbody></table>`;
+
+  // Cache current page data for selection
+  piecesCache.forEach(p=>{
+    if(selectedPieceIds.has(p.id)){
+      const inv=allInventory.find(i=>i.id===p.inventory_id);
+      selectedPieceData.set(p.id,{...p,typeName:inv?.typeName||'',size:inv?.size||''});
+    }
+  });
+
+  // Render pagination
+  renderPiecesPagination(totalPages);
+  updateSelectionUI();
+  updateSelectAllPageCheckbox();
+}
+
+function renderPiecesPagination(totalPages){
+  const el=document.getElementById('pc-pagination');
+  el.style.display='flex';
+  const btn=(label,page,disabled,active)=>`<button class="btn ${active?'btn-primary':'btn-ghost'} btn-sm" ${disabled?'disabled':''} onclick="gotoPiecesPage(${page})" style="width:auto;min-width:36px;justify-content:center;padding:6px 12px;">${label}</button>`;
+  const pages=[];
+  const window=2;
+  const start=Math.max(1,piecesPage-window);
+  const end=Math.min(totalPages,piecesPage+window);
+  if(start>1){pages.push(btn('1',1,false,piecesPage===1));if(start>2)pages.push('<span style="color:var(--text3);padding:0 4px;">…</span>');}
+  for(let i=start;i<=end;i++)pages.push(btn(String(i),i,false,piecesPage===i));
+  if(end<totalPages){if(end<totalPages-1)pages.push('<span style="color:var(--text3);padding:0 4px;">…</span>');pages.push(btn(String(totalPages),totalPages,false,piecesPage===totalPages));}
+
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;">
+      <label style="font-size:12px;color:var(--text3);">Per page:</label>
+      <select onchange="changePiecesPageSize(this.value)" style="padding:6px 10px;background:var(--bg2);border:1px solid var(--bd1);border-radius:6px;color:var(--text1);font-size:13px;">
+        <option value="50" ${piecesPageSize===50?'selected':''}>50</option>
+        <option value="100" ${piecesPageSize===100?'selected':''}>100</option>
+        <option value="200" ${piecesPageSize===200?'selected':''}>200</option>
+        <option value="500" ${piecesPageSize===500?'selected':''}>500</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+      ${btn('← Prev',piecesPage-1,piecesPage<=1,false)}
+      ${pages.join('')}
+      ${btn('Next →',piecesPage+1,piecesPage>=totalPages,false)}
+    </div>
+    <div style="font-size:12px;color:var(--text3);">
+      Showing ${(piecesPage-1)*piecesPageSize+1}–${Math.min(piecesPage*piecesPageSize,piecesTotalCount)} of ${piecesTotalCount}
+    </div>`;
+}
+
+function togglePieceSelection(id,checked){
+  if(checked){
+    selectedPieceIds.add(id);
+    const p=piecesCache.find(x=>x.id===id);
+    if(p){const inv=allInventory.find(i=>i.id===p.inventory_id);selectedPieceData.set(id,{...p,typeName:inv?.typeName||'',size:inv?.size||''});}
+  } else {
+    selectedPieceIds.delete(id);
+    selectedPieceData.delete(id);
+  }
+  updateSelectionUI();
+  updateSelectAllPageCheckbox();
+}
+
+function toggleSelectAllOnPage(checked){
+  piecesCache.forEach(p=>{
+    if(checked){
+      selectedPieceIds.add(p.id);
+      const inv=allInventory.find(i=>i.id===p.inventory_id);
+      selectedPieceData.set(p.id,{...p,typeName:inv?.typeName||'',size:inv?.size||''});
+    } else {
+      selectedPieceIds.delete(p.id);
+      selectedPieceData.delete(p.id);
+    }
+  });
+  document.querySelectorAll('.pc-row-check').forEach(cb=>{cb.checked=checked;});
+  updateSelectionUI();
+}
+
+function updateSelectAllPageCheckbox(){
+  const hdr=document.getElementById('pc-select-all-page');
+  if(!hdr)return;
+  if(!piecesCache.length){hdr.checked=false;hdr.indeterminate=false;return;}
+  const selOnPage=piecesCache.filter(p=>selectedPieceIds.has(p.id)).length;
+  hdr.checked=selOnPage===piecesCache.length;
+  hdr.indeterminate=selOnPage>0&&selOnPage<piecesCache.length;
+}
+
+function updateSelectionUI(){
+  const n=selectedPieceIds.size;
+  const info=document.getElementById('pc-selected-info');
+  const clr=document.getElementById('pc-clear-sel');
+  const exp=document.getElementById('pc-export-sel');
+  if(info)info.textContent=n?`· ${n} selected (across all pages)`:'';
+  if(clr)clr.style.display=n?'':'none';
+  if(exp)exp.style.display=n?'':'none';
+}
+
+function clearPieceSelection(){
+  selectedPieceIds.clear();
+  selectedPieceData.clear();
+  document.querySelectorAll('.pc-row-check').forEach(cb=>{cb.checked=false;});
+  const hdr=document.getElementById('pc-select-all-page');if(hdr){hdr.checked=false;hdr.indeterminate=false;}
+  updateSelectionUI();
+}
+
+async function selectAllMatching(){
+  if(piecesTotalCount>10000){
+    if(!confirm(`${piecesTotalCount} pieces match. Ye bohat bada hai — continue?`))return;
+  }
+  const filters=piecesGetFilters();
+  if(filters.invIds!==null && !filters.invIds.length){showToast('Koi match nahi','error');return;}
+
+  // Fetch all IDs in chunks of 1000
+  let allRows=[];
+  let from=0;
+  const chunkSize=1000;
+  while(true){
+    let q=sb.from('pieces').select('*').order('created_at',{ascending:false});
+    q=piecesApplyFilters(q,filters,true);
+    q=q.range(from,from+chunkSize-1);
+    const {data,error}=await q;
+    if(error){showToast('Fetch error: '+error.message,'error');return;}
+    if(!data||!data.length)break;
+    allRows=allRows.concat(data);
+    if(data.length<chunkSize)break;
+    from+=chunkSize;
+    if(allRows.length>=piecesTotalCount)break;
+  }
+  allRows.forEach(p=>{
+    selectedPieceIds.add(p.id);
+    const inv=allInventory.find(i=>i.id===p.inventory_id);
+    selectedPieceData.set(p.id,{...p,typeName:inv?.typeName||'',size:inv?.size||''});
+  });
+  document.querySelectorAll('.pc-row-check').forEach(cb=>{cb.checked=true;});
+  updateSelectionUI();
+  updateSelectAllPageCheckbox();
+  showToast(`${allRows.length} pieces selected`,'success');
+}
+
+function piecesToCSV(rows){
+  const header='Barcode,Product,Size,Status,Generated,Added At,Added By,Used At,Used By';
+  const body=rows.map(p=>[p.barcode,p.typeName||'',p.size||'',p.status,p.created_at,p.added_at||'',p.added_by_email||'',p.used_at||'',p.used_by_email||''].map(x=>`"${(x||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  return header+'\n'+body;
+}
+
+function downloadCSV(csv,filename){
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+}
+
+function exportSelectedPiecesCSV(){
+  if(!selectedPieceIds.size){showToast('Koi selection nahi','error');return;}
+  const rows=Array.from(selectedPieceData.values());
+  downloadCSV(piecesToCSV(rows),`pieces_selected_${Date.now()}.csv`);
+  showToast(`${rows.length} pieces exported`,'success');
+}
+
+async function exportAllFilteredPiecesCSV(){
+  const filters=piecesGetFilters();
+  if(filters.invIds!==null && !filters.invIds.length){showToast('Koi match nahi','error');return;}
+  if(piecesTotalCount>10000){
+    if(!confirm(`${piecesTotalCount} rows export karne hain — bada file banega. Continue?`))return;
+  }
+  let allRows=[];
+  let from=0;const chunkSize=1000;
+  while(true){
+    let q=sb.from('pieces').select('*').order('created_at',{ascending:false});
+    q=piecesApplyFilters(q,filters,true);
+    q=q.range(from,from+chunkSize-1);
+    const {data,error}=await q;
+    if(error){showToast('Fetch error: '+error.message,'error');return;}
+    if(!data||!data.length)break;
+    allRows=allRows.concat(data);
+    if(data.length<chunkSize)break;
+    from+=chunkSize;
+  }
+  const enriched=allRows.map(p=>{const inv=allInventory.find(i=>i.id===p.inventory_id);return {...p,typeName:inv?.typeName||'',size:inv?.size||''};});
+  downloadCSV(piecesToCSV(enriched),`pieces_all_${Date.now()}.csv`);
+  showToast(`${enriched.length} pieces exported`,'success');
+}
+
+async function deleteSinglePiece(pieceId,barcode){
+  if(!confirm(`Piece delete karo?\n\nBarcode: ${barcode}\n\nYe action undo nahi ho sakta.`))return;
+  try {
+    const {error}=await sb.from('pieces').delete().eq('id',pieceId).eq('status','generated');
+    if(error)throw error;
+    showToast(`Piece deleted: ${barcode}`,'success');
+    await renderPiecesView();
+  } catch(e) {
+    showToast('Error: '+e.message,'error');
+  }
+}
+
+async function bulkDeleteGeneratedPieces(){
+  const filters=piecesGetFilters();
+  if(filters.invIds!==null && !filters.invIds.length){showToast('Koi match nahi','error');return;}
+
+  // Count Generated under current type/size/search filters (ignore status)
+  const countQ=piecesApplyFilters(sb.from('pieces').select('*',{count:'exact',head:true}).eq('status','generated'),{...filters,statusFilter:''},false);
+  const {count,error:cErr}=await countQ;
+  if(cErr){showToast('Error: '+cErr.message,'error');return;}
+  if(!count){showToast('Koi generated piece nahi hai delete karne ko','error');return;}
+
+  const typeName=filters.typeFilter?allTypes.find(t=>t.id==filters.typeFilter)?.name:'All products';
+  const msg=`⚠️ DELETE ${count} GENERATED PIECES?\n\nFilter: ${typeName}${filters.sizeFilter?' · '+filters.sizeFilter:''}\n\nSirf 'Generated' status wale pieces delete honge (In-Stock aur Used pieces safe rahenge).\n\nYe action undo NAHI ho sakta.\n\nConfirm karne ke liye "DELETE" type karo:`;
+  const typed=prompt(msg);
+  if(typed!=='DELETE'){showToast('Cancel kiya','error');return;}
+
+  try {
+    // Fetch all matching IDs in chunks, then delete in chunks of 500
+    let allIds=[];let from=0;const chunk=1000;
+    while(true){
+      let q=sb.from('pieces').select('id').eq('status','generated').order('id',{ascending:true});
+      q=piecesApplyFilters(q,{...filters,statusFilter:''},false);
+      q=q.range(from,from+chunk-1);
+      const {data,error}=await q;
+      if(error)throw error;
+      if(!data||!data.length)break;
+      allIds=allIds.concat(data.map(r=>r.id));
+      if(data.length<chunk)break;
+      from+=chunk;
+    }
+    let deleted=0;
+    for(let i=0;i<allIds.length;i+=500){
+      const ck=allIds.slice(i,i+500);
+      const {error}=await sb.from('pieces').delete().in('id',ck).eq('status','generated');
+      if(error)throw error;
+      deleted+=ck.length;
+    }
+    showToast(`✓ ${deleted} pieces deleted`,'success');
+    await renderPiecesView();
+  } catch(e) {
+    showToast('Error: '+e.message,'error');
+  }
+}
+
+function printFilteredLabels(){
+  if(selectedPieceIds.size){
+    // Print selected pieces (across all pages)
+    labelsToPrint=Array.from(selectedPieceData.values()).map(p=>({barcode:p.barcode,typeName:p.typeName,size:p.size}));
+    openPrintView();
+    return;
+  }
+  if(!piecesCache.length){showToast('Pehle filter laga ke pieces load karo, ya pieces select karo','error');return;}
+  if(piecesTotalCount>piecesCache.length){
+    if(!confirm(`Current page ke ${piecesCache.length} labels print honge. Agar saare ${piecesTotalCount} print karne hain toh pehle "Select All Matching" click karo.\n\nContinue with current page?`))return;
+  }
+  labelsToPrint=piecesCache.map(p=>{
+    const inv=allInventory.find(i=>i.id===p.inventory_id);
+    return {barcode:p.barcode,typeName:inv?.typeName||'',size:inv?.size||''};
+  });
+  openPrintView();
+}
+
+function openPrintLabelsForLastBatch(){
+  if(!lastGeneratedPieces.length){showToast('Kuch generate nahi hua','error');return;}
+  labelsToPrint=[...lastGeneratedPieces];
+  openPrintView();
+}
+
+function openPrintView(){
+  document.getElementById('print-view').classList.add('open');
+  document.getElementById('print-count').textContent=labelsToPrint.length;
+  renderPrintLabels();
+}
+
+function closePrintView(){
+  document.getElementById('print-view').classList.remove('open');
+}
+
+function renderPrintLabels(){
+  const size=document.getElementById('print-size').value;
+  const grid=document.getElementById('print-labels-grid');
+  grid.className='labels-grid size-'+size;
+  grid.innerHTML=labelsToPrint.map((l,i)=>`
+    <div class="label">
+      <div class="label-name">${l.typeName} · ${l.size}</div>
+      <svg id="bc-svg-${i}"></svg>
+      <div class="label-code">${l.barcode}</div>
+    </div>`).join('');
+  setTimeout(()=>{
+    const opts={small:{w:1,h:30},medium:{w:1.2,h:38},large:{w:1.5,h:50},thermal:{w:1.8,h:50}};
+    const opt=opts[size]||opts.medium;
+    labelsToPrint.forEach((l,i)=>{
+      try {
+        JsBarcode(`#bc-svg-${i}`,l.barcode,{format:'CODE128',width:opt.w,height:opt.h,displayValue:false,margin:2});
+      } catch(e){console.warn('barcode render:',e);}
+    });
+  },50);
+}
+
 const viewMeta={
-  stock:{title:'Stock View',sub:'Saari inventory ek jagah'},
-  alerts:{title:'Alerts',sub:'Low aur out of stock items'},
+  stock:{title:'Dashboard',sub:'Saari inventory ek jagah'},
+  alerts:{title:'Alerts & Production List',sub:'Low stock alerts aur production planning'},
   scanner:{title:'Scanner Mode',sub:'Barcode scan karke stock manage karo'},
   workers:{title:'Worker Stats',sub:'Scan productivity aur leaderboard'},
-  barcodes:{title:'Barcodes',sub:'Har product-size ka unique barcode'},
-  add:{title:'Stock Add',sub:'Naya stock entry karo'},
-  print:{title:'Print Minus',sub:'Printed items stock se minus karo'},
+  genpieces:{title:'Generate Pieces',sub:'Unique per-piece barcodes banao'},
+  pieces:{title:'Stock Details',sub:'Saare pieces ka detailed record'},
   minstock:{title:'Min Stock',sub:'Minimum stock limits set karo'},
   types:{title:'Manage Types',sub:'Product types manage karo'},
   users:{title:'Users',sub:'Team members aur roles'},
@@ -1749,24 +2842,24 @@ const viewMeta={
 
 function switchView(view){
   const role=currentProfile?.role||'viewer';
-  if(['add','print','minstock','scanner','workers'].includes(view)&&!['admin','manager'].includes(role)){showToast('Access denied','error');return;}
-  if(['types','users','barcodes'].includes(view)&&role!=='admin'){showToast('Sirf admin access kar sakta hai','error');return;}
+  if(['minstock','scanner','workers','genpieces','pieces'].includes(view)&&!['admin','manager'].includes(role)){showToast('Access denied','error');return;}
+  if(['types','users'].includes(view)&&role!=='admin'){showToast('Sirf admin access kar sakta hai','error');return;}
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('view-'+view).classList.add('active');
+  const viewEl=document.getElementById('view-'+view);
+  if(viewEl)viewEl.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')===`switchView('${view}')`)n.classList.add('active');});
   document.getElementById('topbar-title').textContent=viewMeta[view].title;
   document.getElementById('topbar-sub').textContent=viewMeta[view].sub;
-  if(view==='alerts')renderAlertsView();
-  if(view==='print'){refreshTypeDropdowns();renderBulkTable();}
+  if(view==='alerts'){renderProdList();renderAlertsView();}
   if(view==='minstock')renderMinList();
   if(view==='types')renderTypesListView();
   if(view==='users')renderUsersView();
   if(view==='log')renderLogView();
-  if(view==='add')refreshTypeDropdowns();
-  if(view==='scanner'){setupScannerInput();renderScanBatch();focusScanner();}
+  if(view==='scanner'){setupScannerInput();renderScanBatch();focusScanner();preloadAvailablePieces();}
   if(view==='workers')renderWorkersView();
-  if(view==='barcodes')renderBarcodesView();
+  if(view==='genpieces'){refreshGenDropdowns();updateGenSample();}
+  if(view==='pieces'){refreshPieceFilterDropdowns();renderPiecesView();}
 }
 
 // ─── MODAL HELPERS ───
@@ -1775,13 +2868,11 @@ function closeModal(id){
   if(id==='edit-modal')editItemId=null;
   if(id==='delete-modal')deleteTypeName=null;
   if(id==='role-modal')roleChangeUserId=null;
-  // refocus scanner if scanner view
   focusScanner();
 }
 document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);});});
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal('edit-modal');closeModal('delete-modal');closeModal('role-modal');}
-  // Enter on modal — only fire confirmEdit if modal is open AND active element is the qty input
+  if(e.key==='Escape'){closeModal('edit-modal');closeModal('delete-modal');closeModal('role-modal');closeModal('bulk-edit-modal');}
   if(e.key==='Enter'&&editItemId&&document.getElementById('edit-modal').classList.contains('open')){
     if(document.activeElement?.id==='modal-qty'){e.preventDefault();confirmEdit();}
   }
