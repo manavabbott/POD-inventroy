@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,10 +52,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-secondary:hover{background:var(--bg4);}
 .btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(255,107,107,0.2);}
 .btn-danger:hover{background:rgba(255,107,107,0.2);}
+.btn-success{background:var(--green);color:#fff;}
+.btn-success:hover{background:#2fb875;}
 .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2);}
 .btn-ghost:hover{background:var(--bg3);}
 .btn-sm{padding:5px 11px;font-size:12px;}
 .btn-full{width:100%;justify-content:center;}
+.btn-lg{padding:12px 22px;font-size:14px;}
 
 /* APP LAYOUT */
 .app-layout{display:flex;min-height:100vh;}
@@ -104,6 +108,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .stat-value{font-size:28px;font-weight:600;font-family:'DM Mono',monospace;}
 .stat-value.red{color:var(--red);}
 .stat-value.amber{color:var(--amber);}
+.stat-value.green{color:var(--green);}
 .stat-icon{position:absolute;right:16px;top:16px;font-size:22px;opacity:0.12;}
 
 /* TABLE */
@@ -123,6 +128,7 @@ tbody td{padding:11px 20px;border-bottom:1px solid var(--border);font-size:13px;
 tbody tr:last-child td{border-bottom:none;}
 .cell-mono{font-family:'DM Mono',monospace;font-size:13px;}
 .size-pill{background:var(--bg3);padding:3px 8px;border-radius:6px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);}
+.barcode-pill{background:var(--bg4);padding:3px 8px;border-radius:6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);border:1px dashed var(--border2);}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
 .badge::before{content:'';width:5px;height:5px;border-radius:50%;}
 .badge-ok{background:var(--green-bg);color:var(--green);}
@@ -171,13 +177,13 @@ tbody tr:last-child td{border-bottom:none;}
 .log-item:hover{background:var(--bg3);}
 .log-item:last-child{border-bottom:none;}
 .log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.log-dot.add{background:var(--green);}
-.log-dot.print{background:var(--red);}
+.log-dot.add,.log-dot.scan-add{background:var(--green);}
+.log-dot.print,.log-dot.scan-sub{background:var(--red);}
 .log-dot.update-add{background:var(--accent);}
 .log-dot.update-sub{background:var(--amber);}
-.log-type{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;width:80px;flex-shrink:0;}
-.log-type.add{color:var(--green);}
-.log-type.print{color:var(--red);}
+.log-type{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;width:90px;flex-shrink:0;}
+.log-type.add,.log-type.scan-add{color:var(--green);}
+.log-type.print,.log-type.scan-sub{color:var(--red);}
 .log-type.update-add{color:var(--accent);}
 .log-type.update-sub{color:var(--amber);}
 .log-detail{flex:1;font-size:13px;color:var(--text2);}
@@ -232,6 +238,84 @@ tbody tr:last-child td{border-bottom:none;}
 .users-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
 .users-section-title:first-child{margin-top:0;}
 
+/* ============ SCANNER VIEW ============ */
+.scan-hero{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border2);border-radius:var(--radius-lg);padding:24px;margin-bottom:18px;position:relative;overflow:hidden;}
+.scan-hero.mode-add{border-left:4px solid var(--green);}
+.scan-hero.mode-sub{border-left:4px solid var(--red);}
+.scan-hero-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.scan-mode-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;}
+.scan-mode-badge.add{background:var(--green-bg);color:var(--green);}
+.scan-mode-badge.sub{background:var(--red-bg);color:var(--red);}
+.scan-mode-badge::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;animation:pulse 1.5s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+.scan-toggle{display:grid;grid-template-columns:1fr 1fr;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:3px;gap:3px;min-width:260px;}
+.scan-toggle button{padding:10px;border:none;background:transparent;color:var(--text3);font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.scan-toggle button.on-add{background:var(--green);color:#fff;box-shadow:0 2px 8px rgba(61,214,140,0.3);}
+.scan-toggle button.on-sub{background:var(--red);color:#fff;box-shadow:0 2px 8px rgba(255,107,107,0.3);}
+
+.scan-input-area{margin-top:18px;position:relative;}
+.scan-input{width:100%;background:var(--bg);border:2px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:18px;padding:16px 20px;font-family:'DM Mono',monospace;outline:none;transition:all 0.15s;letter-spacing:0.05em;}
+.scan-input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(108,143,255,0.15);}
+.scan-input-hint{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3);pointer-events:none;display:flex;align-items:center;gap:6px;}
+.scan-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.2s ease infinite;}
+
+.scan-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px;}
+.scan-stat{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
+.scan-stat-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;}
+.scan-stat-value{font-size:24px;font-weight:600;font-family:'DM Mono',monospace;}
+
+.scan-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+
+.scan-breakdown{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:18px;max-height:340px;overflow-y:auto;}
+.scan-breakdown-hdr{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--bg2);z-index:2;}
+.scan-break-row{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--border);animation:fadeIn 0.2s ease;}
+.scan-break-row:last-child{border-bottom:none;}
+.scan-break-name{flex:1;font-size:13px;font-weight:500;}
+.scan-break-size{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);background:var(--bg3);padding:2px 8px;border-radius:6px;}
+.scan-break-count{font-family:'DM Mono',monospace;font-size:16px;font-weight:600;color:var(--accent);min-width:40px;text-align:right;}
+
+.recent-scan{display:flex;align-items:center;gap:10px;padding:8px 20px;border-bottom:1px solid var(--border);font-size:13px;animation:slideIn 0.2s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.recent-scan:last-child{border-bottom:none;}
+.recent-scan-code{font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);}
+.recent-scan-name{flex:1;}
+.recent-scan-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);}
+
+.empty-scan{text-align:center;padding:48px 20px;color:var(--text3);}
+.empty-scan-icon{font-size:40px;margin-bottom:12px;opacity:0.3;}
+
+/* flash effect for successful scan */
+.flash-success{animation:flashGreen 0.4s ease;}
+.flash-error{animation:flashRed 0.4s ease;}
+@keyframes flashGreen{0%{background:var(--bg);}40%{background:rgba(61,214,140,0.2);border-color:var(--green);}100%{background:var(--bg);}}
+@keyframes flashRed{0%{background:var(--bg);}40%{background:rgba(255,107,107,0.2);border-color:var(--red);}100%{background:var(--bg);}}
+
+/* barcode manage */
+.barcode-row{display:grid;grid-template-columns:1fr 80px 180px 110px;gap:10px;padding:11px 20px;border-bottom:1px solid var(--border);align-items:center;}
+.barcode-row:last-child{border-bottom:none;}
+.barcode-row:hover{background:var(--bg3);}
+.barcode-hdr{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;padding:8px 20px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 80px 180px 110px;gap:10px;}
+.bc-input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;padding:6px 10px;font-family:'DM Mono',monospace;outline:none;width:100%;}
+.bc-input:focus{border-color:var(--accent);}
+
+/* worker perf */
+.worker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.worker-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;position:relative;}
+.worker-card-rank{position:absolute;top:14px;right:14px;font-size:11px;font-weight:600;color:var(--text3);font-family:'DM Mono',monospace;}
+.worker-card-rank.gold{color:#fbbf24;}
+.worker-card-rank.silver{color:#cbd5e1;}
+.worker-card-rank.bronze{color:#d97706;}
+.worker-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a78bfa);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;margin-bottom:10px;}
+.worker-name{font-size:14px;font-weight:600;margin-bottom:2px;}
+.worker-email{font-size:11px;color:var(--text3);margin-bottom:14px;font-family:'DM Mono',monospace;}
+.worker-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.worker-stat{background:var(--bg3);border-radius:8px;padding:10px;}
+.worker-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;}
+.worker-stat-value{font-size:18px;font-weight:600;font-family:'DM Mono',monospace;}
+.worker-stat-value.add{color:var(--green);}
+.worker-stat-value.sub{color:var(--red);}
+
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:all 0.25s;z-index:999;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow);transform:translateY(8px);max-width:320px;}
 .toast.show{opacity:1;transform:translateY(0);}
@@ -251,17 +335,13 @@ tbody tr:last-child td{border-bottom:none;}
 </head>
 <body>
 
-<!-- CONFIG — APNI KEYS YAHAN DALO -->
+<!-- CONFIG -->
 <script>
 const SUPABASE_URL = 'https://swziotxspvfjfrsoqudv.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3emlvdHhzcHZmamZyc29xdWR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzk1MjYsImV4cCI6MjA5MTY1NTUyNn0.0yz3su9Emc-V7QBjB7YHkLXZ3l7lx2srWaH5gJWHjgI';
   const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    storage: window.localStorage
-  }
+  auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage }
 });
 </script>
 
@@ -283,30 +363,18 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       <div id="auth-err" class="auth-err"></div>
       <div id="auth-ok" class="auth-ok"></div>
       <div id="login-form">
-        <div class="fg">
-          <label>Email</label>
-          <input type="email" id="login-email" placeholder="aapka@email.com" onkeydown="if(event.key==='Enter')doLogin()">
-        </div>
-        <div class="fg">
-          <label>Password</label>
-          <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-        </div>
+        <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="aapka@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div class="fg"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
         <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Login</button>
       </div>
       <div id="signup-form" style="display:none;">
-        <div class="fg">
-          <label>Full Name</label>
-          <input type="text" id="signup-name" placeholder="Aapka naam">
-        </div>
-        <div class="fg">
-          <label>Email</label>
-          <input type="email" id="signup-email" placeholder="aapka@email.com">
-        </div>
-        <div class="fg">
-          <label>Password</label>
-          <input type="password" id="signup-pass" placeholder="Min 6 characters">
-        </div>
+        <div class="fg"><label>Full Name</label><input type="text" id="signup-name" placeholder="Aapka naam"></div>
+        <div class="fg"><label>Email</label><input type="email" id="signup-email" placeholder="aapka@email.com"></div>
+        <div class="fg"><label>Password</label><input type="password" id="signup-pass" placeholder="Min 6 characters"></div>
         <button class="btn btn-primary" id="signup-btn" onclick="doSignup()">Account Banao</button>
+      </div>
+      <div style="margin-top:18px;text-align:center;">
+        <a href="#" onclick="clearStuckSession();return false;" style="font-size:11px;color:var(--text3);text-decoration:none;">Page hang ho gaya? Reset karo →</a>
       </div>
     </div>
   </div>
@@ -335,7 +403,18 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
           Alerts
         </div>
-        <div class="nav-section nav-action-section" style="margin-top:6px;">Actions</div>
+
+        <div class="nav-section nav-action-section" style="margin-top:6px;">Scanner</div>
+        <div class="nav-item nav-manager" onclick="switchView('scanner')">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h4v4H4V4zm12 0h4v4h-4V4zM4 16h4v4H4v-4zm12 0h4v4h-4v-4zM10 4v16M6 10h12M6 14h12"/></svg>
+          Scan Mode
+        </div>
+        <div class="nav-item nav-manager" onclick="switchView('workers')">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          Worker Stats
+        </div>
+
+        <div class="nav-section" style="margin-top:6px;">Actions</div>
         <div class="nav-item nav-manager" onclick="switchView('add')">
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
           Stock Add
@@ -344,10 +423,15 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
           Print Minus
         </div>
+
         <div class="nav-section nav-admin-section" style="margin-top:6px;">Settings</div>
         <div class="nav-item nav-manager" onclick="switchView('minstock')">
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
           Min Stock
+        </div>
+        <div class="nav-item nav-admin" onclick="switchView('barcodes')">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h2v16H4V4zm4 0h1v16H8V4zm3 0h2v16h-2V4zm4 0h1v16h-1V4zm3 0h2v16h-2V4z"/></svg>
+          Barcodes
         </div>
         <div class="nav-item nav-admin" onclick="switchView('types')">
           <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
@@ -404,6 +488,113 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
           <div id="alerts-content"><div class="loader"><div class="spinner"></div> Loading...</div></div>
         </div>
 
+        <!-- ============ SCANNER VIEW ============ -->
+        <div id="view-scanner" class="view">
+          <div class="scan-hero mode-add" id="scan-hero">
+            <div class="scan-hero-row">
+              <div>
+                <div style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Current Mode</div>
+                <span class="scan-mode-badge add" id="scan-mode-badge">ADD · Stock Inward</span>
+              </div>
+              <div style="margin-left:auto;">
+                <div class="scan-toggle">
+                  <button id="scan-btn-add" class="on-add" onclick="setScanMode('add')">↑ ADD (Inward)</button>
+                  <button id="scan-btn-sub" onclick="setScanMode('sub')">↓ MINUS (Print)</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="scan-input-area">
+              <input type="text" id="scan-input" class="scan-input" placeholder="Scan barcode or type and press Enter..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <div class="scan-input-hint"><span class="scan-dot"></span> <span id="scan-listening">Listening</span></div>
+            </div>
+
+            <div class="scan-stats">
+              <div class="scan-stat">
+                <div class="scan-stat-label">Total Scanned</div>
+                <div class="scan-stat-value" id="scan-total">0</div>
+              </div>
+              <div class="scan-stat">
+                <div class="scan-stat-label">Unique Items</div>
+                <div class="scan-stat-value" id="scan-unique">0</div>
+              </div>
+              <div class="scan-stat">
+                <div class="scan-stat-label">Last Scan</div>
+                <div class="scan-stat-value" id="scan-last" style="font-size:14px;color:var(--text3);">—</div>
+              </div>
+            </div>
+
+            <div class="scan-actions">
+              <button class="btn btn-success btn-lg" id="scan-process" onclick="processScanBatch()">✓ Process Batch</button>
+              <button class="btn btn-ghost" onclick="resetScanBatch()">Reset</button>
+              <button class="btn btn-ghost" onclick="undoLastScan()">Undo Last</button>
+              <label style="display:inline-flex;align-items:center;gap:6px;color:var(--text2);font-size:12px;margin-left:auto;cursor:pointer;">
+                <input type="checkbox" id="scan-sound" checked> Sound
+              </label>
+              <label style="display:inline-flex;align-items:center;gap:6px;color:var(--text2);font-size:12px;cursor:pointer;">
+                <input type="checkbox" id="scan-autoprocess"> Auto-process @ 50
+              </label>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+            <div class="scan-breakdown">
+              <div class="scan-breakdown-hdr">
+                <span style="font-size:13px;font-weight:600;">Batch Breakdown</span>
+                <span class="tcount" id="scan-break-count">0 items</span>
+              </div>
+              <div id="scan-breakdown-list">
+                <div class="empty-scan"><div class="empty-scan-icon">📦</div>No scans yet<br><span style="font-size:11px;">Scan a barcode to start</span></div>
+              </div>
+            </div>
+
+            <div class="scan-breakdown">
+              <div class="scan-breakdown-hdr">
+                <span style="font-size:13px;font-weight:600;">Recent Scans</span>
+                <span class="tcount" id="scan-recent-count">0</span>
+              </div>
+              <div id="scan-recent-list">
+                <div class="empty-scan"><div class="empty-scan-icon">⚡</div>Recent scans will appear here</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ WORKER STATS ============ -->
+        <div id="view-workers" class="view">
+          <div class="stats-row" id="worker-stats-row"></div>
+          <div style="margin-bottom:14px;display:flex;gap:10px;align-items:center;">
+            <span style="font-size:13px;color:var(--text3);">Period:</span>
+            <select id="worker-period" onchange="renderWorkersView()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:7px 12px;outline:none;font-family:'DM Sans',sans-serif;">
+              <option value="today">Today</option>
+              <option value="week" selected>Last 7 days</option>
+              <option value="month">Last 30 days</option>
+              <option value="all">All time</option>
+            </select>
+          </div>
+          <div id="worker-grid-wrap"><div class="loader"><div class="spinner"></div> Loading...</div></div>
+        </div>
+
+        <!-- ============ BARCODES ADMIN ============ -->
+        <div id="view-barcodes" class="view">
+          <div class="panel">
+            <div class="panel-title">Barcode Management</div>
+            <div class="panel-sub">Har product-size combination ke liye unique barcode assign karo. Auto-generate ya manual.</div>
+            <div style="display:flex;gap:10px;">
+              <button class="btn btn-primary" style="width:auto;" onclick="autoGenerateAllBarcodes()">⚡ Auto-Generate Missing</button>
+              <button class="btn btn-ghost" onclick="renderBarcodesView()">Refresh</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-header">
+              <span class="table-header-title">All Barcodes</span>
+              <span class="tcount" id="bc-count">—</span>
+            </div>
+            <div class="barcode-hdr"><span>Product · Size</span><span style="text-align:center;">Stock</span><span>Barcode</span><span style="text-align:center;">Action</span></div>
+            <div id="barcodes-list"><div class="loader"><div class="spinner"></div> Loading...</div></div>
+          </div>
+        </div>
+
         <!-- STOCK ADD -->
         <div id="view-add" class="view">
           <div class="panel">
@@ -457,7 +648,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
           </div>
         </div>
 
-        <!-- MANAGE TYPES (admin only) -->
+        <!-- MANAGE TYPES -->
         <div id="view-types" class="view">
           <div class="panel">
             <div class="panel-title">Add New Type</div>
@@ -473,7 +664,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
           </div>
         </div>
 
-        <!-- USERS (admin only) -->
+        <!-- USERS -->
         <div id="view-users" class="view">
           <div class="panel">
             <div class="panel-title">Invite New User</div>
@@ -489,7 +680,6 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
               </div>
               <button class="btn btn-primary" style="height:38px;width:auto;" onclick="inviteUser()">Invite Karo</button>
             </div>
-            <div style="margin-top:10px;font-size:12px;color:var(--text3);">Note: User ko email aayega, signup karne ke baad role auto-assign ho jaayega</div>
           </div>
           <div class="table-wrap">
             <div class="table-header"><span class="table-header-title">All Users</span><span class="tcount" id="users-count">—</span></div>
@@ -531,7 +721,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   </div>
 </div>
 
-<!-- ROLE CHANGE MODAL -->
+<!-- ROLE MODAL -->
 <div class="modal-overlay" id="role-modal">
   <div class="modal modal-sm">
     <div class="modal-title">Role Change Karo</div>
@@ -567,8 +757,6 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── SUPABASE INIT ───
-
 // ─── STATE ───
 let currentUser = null;
 let currentProfile = null;
@@ -578,7 +766,6 @@ let editItemId = null;
 let editMode = 'add';
 let deleteTypeName = null;
 let roleChangeUserId = null;
-let pendingInviteRole = {};
 
 // ─── AUTH ───
 function authTab(tab) {
@@ -587,28 +774,31 @@ function authTab(tab) {
   document.getElementById('signup-form').style.display = tab==='signup'?'block':'none';
   clearAuthMsg();
 }
+function showAuthErr(msg){const e=document.getElementById('auth-err');e.textContent=msg;e.classList.add('show');document.getElementById('auth-ok').classList.remove('show');}
+function showAuthOk(msg){const e=document.getElementById('auth-ok');e.textContent=msg;e.classList.add('show');document.getElementById('auth-err').classList.remove('show');}
+function clearAuthMsg(){document.getElementById('auth-err').classList.remove('show');document.getElementById('auth-ok').classList.remove('show');}
 
-function showAuthErr(msg){ const e=document.getElementById('auth-err'); e.textContent=msg; e.classList.add('show'); document.getElementById('auth-ok').classList.remove('show'); }
-function showAuthOk(msg){ const e=document.getElementById('auth-ok'); e.textContent=msg; e.classList.add('show'); document.getElementById('auth-err').classList.remove('show'); }
-function clearAuthMsg(){ document.getElementById('auth-err').classList.remove('show'); document.getElementById('auth-ok').classList.remove('show'); }
+function clearStuckSession(){
+  try {
+    Object.keys(localStorage).filter(k=>k.includes('supabase')||k.startsWith('sb-')||k.includes('auth')).forEach(k=>localStorage.removeItem(k));
+    sessionStorage.clear();
+  } catch(e){}
+  location.reload();
+}
 
 async function doLogin() {
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-pass').value;
-  if(!email||!pass){ showAuthErr('Email aur password dono fill karo'); return; }
+  if(!email||!pass){showAuthErr('Email aur password dono fill karo');return;}
   const btn=document.getElementById('login-btn');
-  btn.disabled=true; btn.textContent='Logging in...';
+  btn.disabled=true;btn.textContent='Logging in...';
   try {
-    const result = await Promise.race([
-      sb.auth.signInWithPassword({email,password:pass}),
-      new Promise((_,rej)=>setTimeout(()=>rej(new Error('Login timeout — dobara try karo')),10000))
-    ]);
-    if(result.error) showAuthErr(result.error.message);
+    const {error} = await sb.auth.signInWithPassword({email,password:pass});
+    if(error) showAuthErr(error.message);
   } catch(e) {
-    showAuthErr(e.message);
-    try { Object.keys(localStorage).filter(k=>k.includes('auth-token')).forEach(k=>localStorage.removeItem(k)); } catch(_){}
+    showAuthErr(e.message||'Login failed — network check karo');
   } finally {
-    btn.disabled=false; btn.textContent='Login';
+    btn.disabled=false;btn.textContent='Login';
   }
 }
 
@@ -616,48 +806,123 @@ async function doSignup() {
   const name=document.getElementById('signup-name').value.trim();
   const email=document.getElementById('signup-email').value.trim();
   const pass=document.getElementById('signup-pass').value;
-  if(!name||!email||!pass){ showAuthErr('Sab fields fill karo'); return; }
-  if(pass.length<6){ showAuthErr('Password min 6 characters hona chahiye'); return; }
+  if(!name||!email||!pass){showAuthErr('Sab fields fill karo');return;}
+  if(pass.length<6){showAuthErr('Password min 6 characters');return;}
   const btn=document.getElementById('signup-btn');
-  btn.disabled=true; btn.textContent='Creating...';
+  btn.disabled=true;btn.textContent='Creating...';
   const {error}=await sb.auth.signUp({email,password:pass,options:{data:{name}}});
-  btn.disabled=false; btn.textContent='Account Banao';
+  btn.disabled=false;btn.textContent='Account Banao';
   if(error) showAuthErr(error.message);
   else showAuthOk('Account ban gaya! Email verify karo phir login karo.');
 }
 
 async function doLogout() {
-  await sb.auth.signOut();
+  try {
+    await sb.auth.signOut();
+  } catch(e){}
+  // hard clear any stuck tokens before reload
+  try {
+    Object.keys(localStorage).filter(k=>k.includes('supabase')||k.startsWith('sb-')).forEach(k=>localStorage.removeItem(k));
+  } catch(e){}
   location.reload();
 }
 
-// ─── SESSION ───
-sb.auth.onAuthStateChange(async(event,session)=>{
-  if(session?.user){
-    currentUser=session.user;
-    await loadProfile();
-    initApp();
-  } else {
-    document.getElementById('auth-screen').style.display='';
-    document.getElementById('app-screen').style.display='none';
-  }
+// ─── SESSION BOOTSTRAP ───
+// IMPORTANT: onAuthStateChange callback must NOT be async directly.
+// Supabase docs: async work inside it can deadlock the auth client.
+// We wrap async work in setTimeout(0) so it runs outside the auth lock.
+let _appInitialized = false;
+
+sb.auth.onAuthStateChange((event, session) => {
+  // Don't block the auth event — defer async work
+  setTimeout(async () => {
+    try {
+      if (event === 'SIGNED_OUT' || !session?.user) {
+        _appInitialized = false;
+        currentUser = null;
+        currentProfile = null;
+        document.getElementById('auth-screen').style.display = '';
+        document.getElementById('app-screen').style.display = 'none';
+        return;
+      }
+      // For any event with a session, ensure app is initialized
+      if (!_appInitialized || currentUser?.id !== session.user.id) {
+        currentUser = session.user;
+        await loadProfile();
+        _appInitialized = true;
+        initApp();
+      }
+    } catch(e) {
+      console.error('Auth state change error:',e);
+      showToast('Session error — please logout and login again','error');
+    }
+  }, 0);
 });
 
-async function loadProfile() {
-  // Retry up to 5 times to handle timing issues
-  for(let i=0;i<5;i++){
-    const {data,error}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
-    if(data){currentProfile=data;return;}
-    await new Promise(r=>setTimeout(r,500));
+// On first page load, explicitly check for an existing session.
+// This is more reliable than waiting for onAuthStateChange on reload.
+(async function bootstrapSession(){
+  try {
+    const {data:{session}, error} = await sb.auth.getSession();
+    if(error){
+      console.error('getSession error:',error);
+      // corrupt token — clear and show login
+      Object.keys(localStorage).filter(k=>k.includes('supabase')||k.startsWith('sb-')).forEach(k=>localStorage.removeItem(k));
+      return;
+    }
+    if(session?.user && !_appInitialized){
+      currentUser = session.user;
+      await loadProfile();
+      _appInitialized = true;
+      initApp();
+    }
+  } catch(e) {
+    console.error('Bootstrap failed:',e);
   }
-  // If still no profile, create one
-  const {data}=await sb.from('profiles').upsert({
-    id:currentUser.id,
-    email:currentUser.email,
-    name:currentUser.user_metadata?.name||currentUser.email,
-    role:'viewer'
-  }).select().single();
-  currentProfile=data;
+})();
+
+async function loadProfile() {
+  // Helper: race any promise against a timeout
+  const withTimeout = (p,ms,label) => Promise.race([
+    p,
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error(label+' timeout')),ms))
+  ]);
+
+  try {
+    const {data:first}=await withTimeout(
+      sb.from('profiles').select('*').eq('id',currentUser.id).maybeSingle(),
+      8000,'Profile fetch'
+    );
+    if(first){currentProfile=first;return;}
+  } catch(e){console.warn('Profile fetch slow:',e.message);}
+
+  // short retry (trigger may be creating row)
+  for(let i=0;i<2;i++){
+    await new Promise(r=>setTimeout(r,400));
+    try {
+      const {data}=await withTimeout(
+        sb.from('profiles').select('*').eq('id',currentUser.id).maybeSingle(),
+        5000,'Profile retry'
+      );
+      if(data){currentProfile=data;return;}
+    } catch(e){}
+  }
+
+  // fallback: create profile OR use in-memory default if even that fails
+  try {
+    const {data,error}=await withTimeout(
+      sb.from('profiles').upsert({
+        id:currentUser.id,email:currentUser.email,
+        name:currentUser.user_metadata?.name||currentUser.email,role:'viewer'
+      }).select().single(),
+      5000,'Profile create'
+    );
+    if(error) throw error;
+    currentProfile=data;
+  } catch(e) {
+    console.error('Profile create failed:',e);
+    currentProfile={id:currentUser.id,email:currentUser.email,name:currentUser.user_metadata?.name||currentUser.email,role:'viewer'};
+  }
 }
 
 function initApp() {
@@ -680,28 +945,22 @@ function applyRoleNav(){
 // ─── DATA ───
 async function loadAll() {
   await Promise.all([loadTypes(), loadInventory()]);
-  renderStats();
-  renderTable();
-  updateAlertNav();
+  renderStats(); renderTable(); updateAlertNav();
 }
-
 async function loadTypes() {
   const {data}=await sb.from('product_types').select('*').order('name');
-  allTypes=data||[];
-  refreshTypeDropdowns();
+  allTypes=data||[]; refreshTypeDropdowns();
 }
-
 async function loadInventory() {
   const {data}=await sb.from('inventory').select('*, product_types(name)').order('id');
   allInventory=(data||[]).map(i=>({...i,typeName:i.product_types?.name||'?'}));
 }
 
-function getStatus(item){ if(item.stock<=0)return'out'; if(item.stock<item.min_stock)return'low'; return'ok'; }
-
+function getStatus(item){if(item.stock<=0)return'out';if(item.stock<item.min_stock)return'low';return'ok';}
 function statusBadge(item){
   const s=getStatus(item);
-  if(s==='out') return'<span class="badge badge-out">Out of Stock</span>';
-  if(s==='low') return'<span class="badge badge-low">Low Stock</span>';
+  if(s==='out')return'<span class="badge badge-out">Out of Stock</span>';
+  if(s==='low')return'<span class="badge badge-low">Low Stock</span>';
   return'<span class="badge badge-ok">In Stock</span>';
 }
 
@@ -718,50 +977,50 @@ function renderStats(){
 }
 
 // ─── TABLE ───
-function filterTable(){ renderTable(); }
+function filterTable(){renderTable();}
 function renderTable(){
   const q=(document.getElementById('search-input')?.value||'').toLowerCase();
-  const filtered=allInventory.filter(i=>!q||i.typeName.toLowerCase().includes(q)||i.size.toLowerCase().includes(q));
+  const filtered=allInventory.filter(i=>!q||i.typeName.toLowerCase().includes(q)||i.size.toLowerCase().includes(q)||(i.barcode||'').toLowerCase().includes(q));
   document.getElementById('inv-count').textContent=`${filtered.length} items`;
   const role=currentProfile?.role||'viewer';
   const canEdit=['admin','manager'].includes(role);
   const wrap=document.getElementById('inv-table-wrap');
-  if(!filtered.length){ wrap.innerHTML='<div class="empty-state">No items found</div>'; return; }
-  wrap.innerHTML=`<table><thead><tr><th>Product</th><th>Size</th><th>Stock</th><th>Min Stock</th><th>Status</th>${canEdit?'<th>Action</th>':''}</tr></thead><tbody>
+  if(!filtered.length){wrap.innerHTML='<div class="empty-state">No items found</div>';return;}
+  wrap.innerHTML=`<table><thead><tr><th>Product</th><th>Size</th><th>Barcode</th><th>Stock</th><th>Min</th><th>Status</th>${canEdit?'<th>Action</th>':''}</tr></thead><tbody>
     ${filtered.map(item=>`<tr>
       <td style="font-weight:500;">${item.typeName}</td>
       <td><span class="size-pill">${item.size}</span></td>
+      <td>${item.barcode?`<span class="barcode-pill">${item.barcode}</span>`:'<span style="color:var(--text3);font-size:11px;">—</span>'}</td>
       <td class="cell-mono">${item.stock}</td>
       <td class="cell-mono" style="color:var(--text3);">${item.min_stock}</td>
       <td>${statusBadge(item)}</td>
-      ${canEdit?`<td><button class="btn btn-secondary btn-sm" onclick="openEditModal(${item.id})">Update Stock</button></td>`:''}
+      ${canEdit?`<td><button class="btn btn-secondary btn-sm" onclick="openEditModal(${item.id})">Update</button></td>`:''}
     </tr>`).join('')}
   </tbody></table>`;
 }
 
-// ─── ALERT NAV ───
+// ─── ALERTS ───
 function updateAlertNav(){
   const count=allInventory.filter(i=>getStatus(i)!=='ok').length;
   const nav=document.getElementById('nav-alerts');
-  const ex=nav.querySelector('.nav-badge'); if(ex)ex.remove();
+  const ex=nav.querySelector('.nav-badge');if(ex)ex.remove();
   if(count>0){const b=document.createElement('span');b.className='nav-badge';b.textContent=count;nav.appendChild(b);}
 }
-
 function renderAlertsView(){
   const out=allInventory.filter(i=>getStatus(i)==='out');
   const low=allInventory.filter(i=>getStatus(i)==='low');
   const el=document.getElementById('alerts-content');
-  if(!out.length&&!low.length){ el.innerHTML='<div class="all-ok"><div class="all-ok-icon">✅</div><p>Sab stock theek hai!</p></div>'; return; }
+  if(!out.length&&!low.length){el.innerHTML='<div class="all-ok"><div class="all-ok-icon">✅</div><p>Sab stock theek hai!</p></div>';return;}
   let h='';
-  if(out.length){ h+=`<div class="alert-section"><div class="alert-section-title">Out of Stock (${out.length})</div>${out.map(i=>`<div class="alert-card is-out"><div class="alert-icon out">🚫</div><div class="alert-info"><div class="alert-name">${i.typeName} · ${i.size}</div><div class="alert-detail">0 pcs · min: ${i.min_stock}</div></div><span class="badge badge-out">Out</span></div>`).join('')}</div>`; }
-  if(low.length){ h+=`<div class="alert-section"><div class="alert-section-title">Low Stock (${low.length})</div>${low.map(i=>`<div class="alert-card is-low"><div class="alert-icon low">⚠️</div><div class="alert-info"><div class="alert-name">${i.typeName} · ${i.size}</div><div class="alert-detail">${i.stock} pcs · min: ${i.min_stock}</div></div><span class="badge badge-low">Low</span></div>`).join('')}</div>`; }
+  if(out.length){h+=`<div class="alert-section"><div class="alert-section-title">Out of Stock (${out.length})</div>${out.map(i=>`<div class="alert-card is-out"><div class="alert-icon out">🚫</div><div class="alert-info"><div class="alert-name">${i.typeName} · ${i.size}</div><div class="alert-detail">0 pcs · min: ${i.min_stock}</div></div><span class="badge badge-out">Out</span></div>`).join('')}</div>`;}
+  if(low.length){h+=`<div class="alert-section"><div class="alert-section-title">Low Stock (${low.length})</div>${low.map(i=>`<div class="alert-card is-low"><div class="alert-icon low">⚠️</div><div class="alert-info"><div class="alert-name">${i.typeName} · ${i.size}</div><div class="alert-detail">${i.stock} pcs · min: ${i.min_stock}</div></div><span class="badge badge-low">Low</span></div>`).join('')}</div>`;}
   el.innerHTML=h;
 }
 
-// ─── ADD STOCK ───
+// ─── ADD/MINUS (existing flows) ───
 function refreshTypeDropdowns(){
   ['add-type','ptype'].forEach(id=>{
-    const el=document.getElementById(id); if(!el)return;
+    const el=document.getElementById(id);if(!el)return;
     const cur=el.value;
     el.innerHTML=allTypes.map(t=>`<option value="${t.id}" ${t.id==cur?'selected':''}>${t.name}</option>`).join('');
   });
@@ -773,26 +1032,33 @@ async function addStock(){
   const size=document.getElementById('add-size').value;
   const qty=parseInt(document.getElementById('add-qty').value)||0;
   const minVal=parseInt(document.getElementById('add-min').value)||0;
-  if(!typeId||qty<=0){ showToast('Sab fields fill karo','error'); return; }
+  if(!typeId){showToast('Pehle Manage Types mein product type add karo','error');return;}
+  if(qty<=0){showToast('Valid quantity enter karo','error');return;}
   const existing=allInventory.find(i=>i.product_type_id==typeId&&i.size===size);
   if(existing){
     const {error}=await sb.from('inventory').update({stock:existing.stock+qty,...(minVal>0?{min_stock:minVal}:{})}).eq('id',existing.id);
-    if(error){ showToast('Error: '+error.message,'error'); return; }
+    if(error){showToast('Error: '+error.message,'error');return;}
   } else {
-    const {error}=await sb.from('inventory').insert({product_type_id:typeId,size,stock:qty,min_stock:minVal||20});
-    if(error){ showToast('Error: '+error.message,'error'); return; }
+    const typeName=allTypes.find(t=>t.id==typeId)?.name||'';
+    // Generate unique barcode — retry if collision
+    const used=new Set(allInventory.filter(i=>i.barcode).map(i=>i.barcode.toUpperCase()));
+    let barcode,tries=0;
+    do{barcode=genBarcode(typeName,size);tries++;}while(used.has(barcode.toUpperCase())&&tries<15);
+    const {error}=await sb.from('inventory').insert({product_type_id:typeId,size,stock:qty,min_stock:minVal||20,barcode});
+    if(error){showToast('Error: '+error.message,'error');return;}
   }
   const typeName=allTypes.find(t=>t.id==typeId)?.name;
   await logActivity('add',typeName,size,qty,existing?.stock||0,(existing?.stock||0)+qty);
-  await loadInventory(); renderStats(); renderTable(); updateAlertNav();
+  await loadInventory();renderStats();renderTable();updateAlertNav();
+  // Reset qty so user doesn't accidentally double-add
+  document.getElementById('add-qty').value='50';
   showToast(`${qty} pcs added — ${typeName} ${size}`,'success');
 }
 
-// ─── PRINT MINUS ───
 function updatePSizes(){
   const typeId=document.getElementById('ptype')?.value;
   const sizes=[...new Set(allInventory.filter(i=>i.product_type_id==typeId).map(i=>i.size))];
-  const el=document.getElementById('psize'); if(!el)return;
+  const el=document.getElementById('psize');if(!el)return;
   el.innerHTML=sizes.map(s=>`<option>${s}</option>`).join('');
 }
 
@@ -800,20 +1066,26 @@ async function minusStock(){
   const typeId=document.getElementById('ptype').value;
   const size=document.getElementById('psize').value;
   const qty=parseInt(document.getElementById('pqty').value)||0;
-  if(!typeId||!size||qty<=0){ showToast('Sab fields fill karo','error'); return; }
+  if(!typeId){showToast('Product type select karo','error');return;}
+  if(!size){showToast('Is type ke liye koi stock nahi hai','error');return;}
+  if(qty<=0){showToast('Valid quantity enter karo','error');return;}
   const item=allInventory.find(i=>i.product_type_id==typeId&&i.size===size);
-  if(!item){ showToast('Item nahi mila','error'); return; }
-  if(item.stock<qty){ showToast(`Sirf ${item.stock} pcs available hain`,'error'); return; }
+  if(!item){showToast('Item nahi mila','error');return;}
+  if(item.stock<qty){showToast(`Sirf ${item.stock} pcs available`,'error');return;}
   const {error}=await sb.from('inventory').update({stock:item.stock-qty}).eq('id',item.id);
-  if(error){ showToast('Error: '+error.message,'error'); return; }
+  if(error){showToast('Error: '+error.message,'error');return;}
   await logActivity('print',item.typeName,size,qty,item.stock,item.stock-qty);
-  await loadInventory(); renderStats(); renderTable(); updateAlertNav();
+  await loadInventory();renderStats();renderTable();updateAlertNav();
   showToast(`${qty} pcs minus — ${item.typeName} ${size}`,'success');
 }
 
 function renderBulkTable(){
   const sizes=['XS','S','M','L','XL','2XL','3XL'];
-  const el=document.getElementById('bulk-tbl'); if(!el)return;
+  const el=document.getElementById('bulk-tbl');if(!el)return;
+  if(!allTypes.length||!allInventory.length){
+    el.innerHTML=`<tbody><tr><td style="padding:24px;text-align:center;color:var(--text3);" colspan="${sizes.length+1}">Pehle product types aur stock add karo</td></tr></tbody>`;
+    return;
+  }
   el.innerHTML=`<thead><tr><th>Product</th>${sizes.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody>
     ${allTypes.map(type=>`<tr><td>${type.name}</td>${sizes.map(size=>{
       const item=allInventory.find(i=>i.product_type_id===type.id&&i.size===size);
@@ -826,10 +1098,10 @@ async function doBulkMinus(){
   let updates=[],total=0,errs=[];
   allTypes.forEach(type=>{
     sizes.forEach(size=>{
-      const el=document.getElementById(`blk-${type.id}-${size}`); if(!el)return;
-      const qty=parseInt(el.value)||0; if(qty<=0)return;
-      const item=allInventory.find(i=>i.product_type_id===type.id&&i.size===size); if(!item)return;
-      if(item.stock<qty){errs.push(`${type.name} ${size}: only ${item.stock} left`);return;}
+      const el=document.getElementById(`blk-${type.id}-${size}`);if(!el)return;
+      const qty=parseInt(el.value)||0;if(qty<=0)return;
+      const item=allInventory.find(i=>i.product_type_id===type.id&&i.size===size);if(!item)return;
+      if(item.stock<qty){errs.push(`${type.name} ${size}: only ${item.stock}`);return;}
       updates.push({item,qty,type});total+=qty;
     });
   });
@@ -839,22 +1111,443 @@ async function doBulkMinus(){
     await sb.from('inventory').update({stock:u.item.stock-u.qty}).eq('id',u.item.id);
     await logActivity('print',u.type.name,u.item.size,u.qty,u.item.stock,u.item.stock-u.qty);
   }
-  await loadInventory(); renderStats(); renderTable(); updateAlertNav();
-  showToast(`Total ${total} pcs minus kiya`,'success');
+  await loadInventory();renderStats();renderTable();updateAlertNav();
+  renderBulkTable(); // reset inputs to 0
+  showToast(`Total ${total} pcs minus`,'success');
 }
 
-// ─── UPDATE STOCK MODAL ───
+// ============================================================
+// ─── BARCODE SCANNER SYSTEM ───
+// ============================================================
+
+// Batch state
+const scanBatch = {
+  mode: 'add',           // 'add' | 'sub'
+  scans: [],             // [{barcode, item, ts}]
+  recent: [],            // last 20 for display
+  processing: false
+};
+
+// Size codes for barcode generation
+const SIZE_CODES = {XS:'XS',S:'S',M:'M',L:'L',XL:'XL','2XL':'2XL','3XL':'3XL'};
+
+function abbrType(name){
+  // "Hoodie" -> "HD", "T-Shirt" -> "TS", "Crop Top" -> "CT"
+  const clean=(name||'').replace(/[^a-zA-Z ]/g,'').trim();
+  const words=clean.split(/\s+/).filter(Boolean);
+  if(words.length>=2) return (words[0][0]+words[1][0]).toUpperCase();
+  if(words.length===1){
+    const w=words[0];
+    if(w.length<=2) return w.toUpperCase();
+    // take first and last consonant-ish
+    return (w[0]+w[w.length-1]).toUpperCase();
+  }
+  return 'XX';
+}
+
+function genBarcode(typeName,size){
+  const pref=abbrType(typeName);
+  const sz=SIZE_CODES[size]||size;
+  const rand=Math.floor(Math.random()*900+100); // 100-999
+  const ts=Date.now().toString(36).slice(-3).toUpperCase();
+  return `${pref}-${sz}-${rand}${ts}`;
+}
+
+// Sound feedback (WebAudio — no external files)
+let audioCtx=null;
+function beep(type='ok'){
+  if(!document.getElementById('scan-sound')?.checked) return;
+  try {
+    audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator();
+    const g=audioCtx.createGain();
+    o.connect(g);g.connect(audioCtx.destination);
+    if(type==='ok'){o.frequency.value=1400;g.gain.value=0.15;}
+    else if(type==='err'){o.frequency.value=220;g.gain.value=0.18;}
+    else if(type==='done'){o.frequency.value=900;g.gain.value=0.2;}
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+(type==='done'?0.25:0.08));
+    o.stop(audioCtx.currentTime+(type==='done'?0.25:0.09));
+    if(type==='done'){
+      // second tone
+      setTimeout(()=>{
+        const o2=audioCtx.createOscillator();const g2=audioCtx.createGain();
+        o2.connect(g2);g2.connect(audioCtx.destination);
+        o2.frequency.value=1300;g2.gain.value=0.2;o2.start();
+        g2.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.25);
+        o2.stop(audioCtx.currentTime+0.26);
+      },130);
+    }
+  } catch(_){}
+  // mobile vibration
+  if(navigator.vibrate){navigator.vibrate(type==='err'?[60,40,60]:30);}
+}
+
+function setScanMode(m){
+  scanBatch.mode=m;
+  const hero=document.getElementById('scan-hero');
+  const badge=document.getElementById('scan-mode-badge');
+  const ba=document.getElementById('scan-btn-add');
+  const bs=document.getElementById('scan-btn-sub');
+  hero.classList.toggle('mode-add',m==='add');
+  hero.classList.toggle('mode-sub',m==='sub');
+  badge.className='scan-mode-badge '+(m==='add'?'add':'sub');
+  badge.textContent=m==='add'?'ADD · Stock Inward':'MINUS · Print Dispatch';
+  ba.className=m==='add'?'on-add':'';
+  bs.className=m==='sub'?'on-sub':'';
+  focusScanner();
+}
+
+function focusScanner(){
+  const input=document.getElementById('scan-input');
+  if(input&&document.getElementById('view-scanner')?.classList.contains('active')){
+    setTimeout(()=>input.focus(),50);
+  }
+}
+
+function handleScanInput(barcode){
+  barcode=(barcode||'').trim();
+  if(!barcode) return;
+  const input=document.getElementById('scan-input');
+  // Helpful check: any barcodes assigned at all?
+  const anyBarcodes=allInventory.some(i=>i.barcode);
+  if(!anyBarcodes){
+    flashInput('err');beep('err');
+    showToast('Pehle Barcodes page pe ja ke barcodes assign karo (Auto-Generate button)','error');
+    return;
+  }
+  const item=allInventory.find(i=>(i.barcode||'').toUpperCase()===barcode.toUpperCase());
+  if(!item){
+    flashInput('err');beep('err');
+    showToast(`Barcode not found: ${barcode}`,'error');
+    return;
+  }
+  // if MINUS mode and no stock (counting pending scans), warn
+  if(scanBatch.mode==='sub'){
+    const pendingMinus=scanBatch.scans.filter(s=>s.item.id===item.id).length;
+    if(item.stock-pendingMinus<=0){
+      flashInput('err');beep('err');
+      showToast(`${item.typeName} ${item.size}: stock khatam (${item.stock} avail, ${pendingMinus} already scanned)`,'error');
+      return;
+    }
+  }
+
+  scanBatch.scans.push({barcode:item.barcode,item,ts:Date.now()});
+  scanBatch.recent.unshift({barcode:item.barcode,item,ts:Date.now()});
+  if(scanBatch.recent.length>20) scanBatch.recent.pop();
+  flashInput('ok');beep('ok');
+  renderScanBatch();
+
+  // auto-process at 50
+  if(document.getElementById('scan-autoprocess')?.checked && scanBatch.scans.length>=50 && !scanBatch.processing){
+    processScanBatch();
+  }
+}
+
+function flashInput(type){
+  const input=document.getElementById('scan-input');
+  input.classList.remove('flash-success','flash-error');
+  void input.offsetWidth; // restart anim
+  input.classList.add(type==='ok'?'flash-success':'flash-error');
+}
+
+function renderScanBatch(){
+  document.getElementById('scan-total').textContent=scanBatch.scans.length;
+  // breakdown by sku
+  const byItem={};
+  scanBatch.scans.forEach(s=>{
+    const k=s.item.id;
+    if(!byItem[k]) byItem[k]={item:s.item,count:0};
+    byItem[k].count++;
+  });
+  const entries=Object.values(byItem).sort((a,b)=>b.count-a.count);
+  document.getElementById('scan-unique').textContent=entries.length;
+  const last=scanBatch.scans[scanBatch.scans.length-1];
+  document.getElementById('scan-last').textContent=last?`${last.item.typeName} ${last.item.size}`:'—';
+
+  document.getElementById('scan-break-count').textContent=`${entries.length} items`;
+  const bEl=document.getElementById('scan-breakdown-list');
+  if(!entries.length){
+    bEl.innerHTML='<div class="empty-scan"><div class="empty-scan-icon">📦</div>No scans yet<br><span style="font-size:11px;">Scan a barcode to start</span></div>';
+  } else {
+    bEl.innerHTML=entries.map(e=>`<div class="scan-break-row">
+      <span class="scan-break-name">${e.item.typeName}</span>
+      <span class="scan-break-size">${e.item.size}</span>
+      <span class="scan-break-count">${e.count}</span>
+    </div>`).join('');
+  }
+
+  document.getElementById('scan-recent-count').textContent=scanBatch.recent.length;
+  const rEl=document.getElementById('scan-recent-list');
+  if(!scanBatch.recent.length){
+    rEl.innerHTML='<div class="empty-scan"><div class="empty-scan-icon">⚡</div>Recent scans will appear here</div>';
+  } else {
+    rEl.innerHTML=scanBatch.recent.map(s=>`<div class="recent-scan">
+      <span class="recent-scan-code">${s.barcode}</span>
+      <span class="recent-scan-name">${s.item.typeName} <span class="size-pill">${s.item.size}</span></span>
+      <span class="recent-scan-time">${new Date(s.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>
+    </div>`).join('');
+  }
+}
+
+function undoLastScan(){
+  if(!scanBatch.scans.length){showToast('Kuch scan nahi hua','error');return;}
+  const removed=scanBatch.scans.pop();
+  const idx=scanBatch.recent.findIndex(r=>r.ts===removed.ts);
+  if(idx>=0) scanBatch.recent.splice(idx,1);
+  renderScanBatch();
+  showToast(`Undo: ${removed.item.typeName} ${removed.item.size}`,'success');
+  focusScanner();
+}
+
+function resetScanBatch(){
+  if(!scanBatch.scans.length){focusScanner();return;}
+  if(!confirm(`Reset ${scanBatch.scans.length} scans?`))return;
+  scanBatch.scans=[];scanBatch.recent=[];
+  renderScanBatch();focusScanner();
+}
+
+async function processScanBatch(){
+  if(scanBatch.processing)return;
+  if(!scanBatch.scans.length){showToast('Pehle scan karo','error');return;}
+  scanBatch.processing=true;
+  const btn=document.getElementById('scan-process');
+  btn.disabled=true;btn.textContent='Processing...';
+
+  try {
+    // group by item
+    const grouped={};
+    scanBatch.scans.forEach(s=>{
+      const k=s.item.id;
+      if(!grouped[k]){grouped[k]={item:s.item,qty:0,barcodes:[]};}
+      grouped[k].qty++;
+      grouped[k].barcodes.push(s.barcode);
+    });
+    const groups=Object.values(grouped);
+
+    // validate stock for MINUS mode
+    if(scanBatch.mode==='sub'){
+      for(const g of groups){
+        if(g.item.stock<g.qty){
+          showToast(`${g.item.typeName} ${g.item.size}: only ${g.item.stock} in stock, scanned ${g.qty}`,'error');
+          scanBatch.processing=false;
+          btn.disabled=false;btn.textContent='✓ Process Batch';
+          return;
+        }
+      }
+    }
+
+    // Insert scan_logs FIRST (audit trail priority) — if this fails we abort before touching inventory
+    const scanLogRows=scanBatch.scans.map(s=>({
+      barcode:s.barcode,
+      product_type:s.item.typeName,
+      size:s.item.size,
+      action:scanBatch.mode==='add'?'scan-add':'scan-sub',
+      user_id:currentUser.id,
+      user_email:currentUser.email,
+      inventory_id:s.item.id
+    }));
+    const {error:logErr}=await sb.from('scan_logs').insert(scanLogRows);
+    if(logErr){throw new Error('Scan log insert failed: '+logErr.message);}
+
+    // batch update inventory (one UPDATE per SKU)
+    const invUpdates=groups.map(g=>{
+      const newStock=scanBatch.mode==='add'?g.item.stock+g.qty:g.item.stock-g.qty;
+      return sb.from('inventory').update({stock:newStock}).eq('id',g.item.id);
+    });
+    const results=await Promise.all(invUpdates);
+    const anyErr=results.find(r=>r.error);
+    if(anyErr){throw new Error(anyErr.error.message);}
+
+    // summary activity_log entries per group
+    for(const g of groups){
+      const prev=g.item.stock;
+      const next=scanBatch.mode==='add'?prev+g.qty:prev-g.qty;
+      await logActivity(scanBatch.mode==='add'?'scan-add':'scan-sub',g.item.typeName,g.item.size,g.qty,prev,next);
+    }
+
+    const total=scanBatch.scans.length;
+    scanBatch.scans=[];scanBatch.recent=[];
+    await loadInventory();renderStats();renderTable();updateAlertNav();
+    renderScanBatch();
+    beep('done');
+    showToast(`✓ Batch processed — ${total} pcs ${scanBatch.mode==='add'?'added':'minused'}`,'success');
+  } catch(e){
+    showToast('Error: '+e.message,'error');
+    beep('err');
+  } finally {
+    scanBatch.processing=false;
+    btn.disabled=false;btn.textContent='✓ Process Batch';
+    focusScanner();
+  }
+}
+
+// scanner input setup — on Enter, process
+function setupScannerInput(){
+  const input=document.getElementById('scan-input');
+  if(!input||input.dataset.bound)return;
+  input.dataset.bound='1';
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      e.preventDefault();
+      const val=input.value;
+      input.value='';
+      handleScanInput(val);
+    }
+  });
+  // keep focus when scanner view is active (but don't fight with other legit inputs)
+  input.addEventListener('blur',()=>{
+    setTimeout(()=>{
+      if(!document.getElementById('view-scanner')?.classList.contains('active'))return;
+      if(document.querySelector('.modal-overlay.open'))return;
+      // only refocus if user isn't typing in another input/textarea/select
+      const ae=document.activeElement;
+      if(ae&&ae!==document.body&&['INPUT','TEXTAREA','SELECT','BUTTON'].includes(ae.tagName))return;
+      input.focus();
+    },150);
+  });
+}
+
+// ─── BARCODES ADMIN VIEW ───
+async function renderBarcodesView(){
+  await loadInventory();
+  document.getElementById('bc-count').textContent=`${allInventory.length} items`;
+  const el=document.getElementById('barcodes-list');
+  if(!allInventory.length){el.innerHTML='<div class="empty-state">No inventory</div>';return;}
+  el.innerHTML=allInventory.map(item=>`
+    <div class="barcode-row">
+      <span style="font-weight:500;">${item.typeName} <span style="color:var(--text3);font-size:12px;">· ${item.size}</span></span>
+      <span style="text-align:center;font-family:'DM Mono',monospace;">${item.stock}</span>
+      <input class="bc-input" id="bc-${item.id}" value="${item.barcode||''}" placeholder="Scan or type...">
+      <div style="display:flex;gap:6px;justify-content:center;">
+        <button class="btn btn-secondary btn-sm" onclick="saveBarcode(${item.id})">Save</button>
+        <button class="btn btn-ghost btn-sm" onclick="regenBarcode(${item.id},'${item.typeName.replace(/'/g,"\\'")}','${item.size}')">↻</button>
+      </div>
+    </div>`).join('');
+}
+
+async function saveBarcode(itemId){
+  const val=document.getElementById('bc-'+itemId).value.trim();
+  if(!val){showToast('Barcode empty nahi ho sakta','error');return;}
+  // check uniqueness locally
+  const dup=allInventory.find(i=>i.id!==itemId&&(i.barcode||'').toUpperCase()===val.toUpperCase());
+  if(dup){showToast(`Already used by ${dup.typeName} ${dup.size}`,'error');return;}
+  const {error}=await sb.from('inventory').update({barcode:val}).eq('id',itemId);
+  if(error){showToast('Error: '+error.message,'error');return;}
+  showToast('Barcode saved','success');
+  await loadInventory();
+}
+
+async function regenBarcode(itemId,typeName,size){
+  // generate unique
+  let tries=0,bc;
+  do {
+    bc=genBarcode(typeName,size);
+    tries++;
+  } while(allInventory.some(i=>(i.barcode||'').toUpperCase()===bc.toUpperCase())&&tries<10);
+  document.getElementById('bc-'+itemId).value=bc;
+  await saveBarcode(itemId);
+  renderBarcodesView();
+}
+
+async function autoGenerateAllBarcodes(){
+  const missing=allInventory.filter(i=>!i.barcode);
+  if(!missing.length){showToast('Sab ke barcodes already hain','success');return;}
+  if(!confirm(`Generate barcodes for ${missing.length} items?`))return;
+  const used=new Set(allInventory.filter(i=>i.barcode).map(i=>i.barcode.toUpperCase()));
+  const updates=[];
+  for(const item of missing){
+    let bc,tries=0;
+    do {bc=genBarcode(item.typeName,item.size);tries++;}
+    while(used.has(bc.toUpperCase())&&tries<15);
+    used.add(bc.toUpperCase());
+    updates.push(sb.from('inventory').update({barcode:bc}).eq('id',item.id));
+  }
+  await Promise.all(updates);
+  showToast(`${missing.length} barcodes generated`,'success');
+  await loadInventory();renderBarcodesView();renderTable();
+}
+
+// ─── WORKER STATS ───
+async function renderWorkersView(){
+  const period=document.getElementById('worker-period').value;
+  let since=null;
+  const now=new Date();
+  if(period==='today'){since=new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString();}
+  else if(period==='week'){since=new Date(Date.now()-7*24*3600*1000).toISOString();}
+  else if(period==='month'){since=new Date(Date.now()-30*24*3600*1000).toISOString();}
+
+  // Fetch in chunks of 1000 (Supabase default cap) using range pagination
+  let all=[], from=0, pageSize=1000, done=false;
+  while(!done){
+    let q=sb.from('scan_logs').select('*').order('created_at',{ascending:false}).range(from,from+pageSize-1);
+    if(since) q=q.gte('created_at',since);
+    const {data,error}=await q;
+    if(error){showToast('Error loading stats: '+error.message,'error');break;}
+    all=all.concat(data||[]);
+    if(!data||data.length<pageSize){done=true;}
+    else{from+=pageSize;}
+    if(all.length>50000)break; // safety cap
+  }
+  const scans=all;
+
+  // aggregate by user
+  const byUser={};
+  scans.forEach(l=>{
+    const k=l.user_id||'unknown';
+    if(!byUser[k]){byUser[k]={email:l.user_email||'unknown',add:0,sub:0,total:0};}
+    byUser[k].total++;
+    if(l.action==='scan-add') byUser[k].add++; else byUser[k].sub++;
+  });
+
+  // fetch profiles for names
+  const {data:profiles}=await sb.from('profiles').select('id,name,email');
+  const pMap={};(profiles||[]).forEach(p=>pMap[p.id]=p);
+  const arr=Object.entries(byUser).map(([id,v])=>({id,name:pMap[id]?.name||v.email,email:v.email,...v}));
+  arr.sort((a,b)=>b.total-a.total);
+
+  // top stats
+  const totalScans=scans.length;
+  const totalAdd=scans.filter(s=>s.action==='scan-add').length;
+  const totalSub=scans.filter(s=>s.action==='scan-sub').length;
+  document.getElementById('worker-stats-row').innerHTML=`
+    <div class="stat-card c-blue"><div class="stat-icon">📊</div><div class="stat-label">Total Scans</div><div class="stat-value">${totalScans.toLocaleString()}</div></div>
+    <div class="stat-card c-green"><div class="stat-icon">↑</div><div class="stat-label">Inward</div><div class="stat-value green">${totalAdd.toLocaleString()}</div></div>
+    <div class="stat-card c-red"><div class="stat-icon">↓</div><div class="stat-label">Dispatched</div><div class="stat-value red">${totalSub.toLocaleString()}</div></div>
+    <div class="stat-card c-amber"><div class="stat-icon">👷</div><div class="stat-label">Active Workers</div><div class="stat-value">${arr.length}</div></div>`;
+
+  const wrap=document.getElementById('worker-grid-wrap');
+  if(!arr.length){wrap.innerHTML='<div class="empty-state">Is period mein koi scan activity nahi hui</div>';return;}
+  wrap.innerHTML=`<div class="worker-grid">${arr.map((u,i)=>{
+    const rankCls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    const rankLbl=i===0?'🥇 #1':i===1?'🥈 #2':i===2?'🥉 #3':`#${i+1}`;
+    return `<div class="worker-card">
+      <div class="worker-card-rank ${rankCls}">${rankLbl}</div>
+      <div class="worker-avatar">${(u.name||'?')[0].toUpperCase()}</div>
+      <div class="worker-name">${u.name}</div>
+      <div class="worker-email">${u.email}</div>
+      <div class="worker-stats">
+        <div class="worker-stat"><div class="worker-stat-label">Inward</div><div class="worker-stat-value add">${u.add}</div></div>
+        <div class="worker-stat"><div class="worker-stat-label">Dispatch</div><div class="worker-stat-value sub">${u.sub}</div></div>
+      </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--text3);display:flex;justify-content:space-between;">
+        <span>Total</span><span style="color:var(--text);font-weight:600;font-family:'DM Mono',monospace;">${u.total}</span>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ─── MODAL EDIT ───
 function openEditModal(id){
-  editItemId=id; editMode='add';
+  editItemId=id;editMode='add';
   const item=allInventory.find(i=>i.id===id);
   document.getElementById('modal-title').textContent=`${item.typeName} · ${item.size}`;
   document.getElementById('modal-sub').textContent=`Current stock: ${item.stock} pcs`;
   document.getElementById('modal-qty').value=1;
-  applyMode(); updatePreview();
+  applyMode();updatePreview();
   document.getElementById('edit-modal').classList.add('open');
   setTimeout(()=>document.getElementById('modal-qty').focus(),100);
 }
-
 function setMode(m){editMode=m;applyMode();updatePreview();}
 function applyMode(){
   const a=document.getElementById('btn-mode-add'),s=document.getElementById('btn-mode-sub');
@@ -862,9 +1555,8 @@ function applyMode(){
   if(editMode==='add'){a.className='mode-btn active-add';s.className='mode-btn';cb.textContent='Add Karo';cb.style.background='';cb.style.color='';lbl.textContent='Kitna add karna hai?';}
   else{a.className='mode-btn';s.className='mode-btn active-sub';cb.textContent='Subtract Karo';cb.style.background='var(--red)';cb.style.color='#fff';lbl.textContent='Kitna subtract karna hai?';}
 }
-
 function updatePreview(){
-  const item=allInventory.find(i=>i.id===editItemId); if(!item)return;
+  const item=allInventory.find(i=>i.id===editItemId);if(!item)return;
   const qty=parseInt(document.getElementById('modal-qty').value)||0;
   const pill=document.getElementById('preview-pill');
   if(qty<=0){pill.innerHTML='—';return;}
@@ -872,23 +1564,22 @@ function updatePreview(){
   const col=editMode==='add'?'var(--green)':(nv<item.min_stock?'var(--red)':'var(--amber)');
   pill.innerHTML=`<span>${item.stock}</span><span style="color:var(--text3);">→</span><span style="color:${col};font-weight:600;">${nv}</span><span style="color:var(--text3);">pcs</span>`;
 }
-
 async function confirmEdit(){
-  const item=allInventory.find(i=>i.id===editItemId); if(!item)return;
+  const item=allInventory.find(i=>i.id===editItemId);if(!item)return;
   const qty=parseInt(document.getElementById('modal-qty').value)||0;
-  if(qty<=0){showToast('Valid quantity enter karo','error');return;}
+  if(qty<=0){showToast('Valid quantity','error');return;}
   const old=item.stock;
   let newStock=editMode==='add'?old+qty:old-qty;
-  if(editMode==='sub'&&qty>old){showToast(`Sirf ${old} pcs available hain`,'error');return;}
+  if(editMode==='sub'&&qty>old){showToast(`Only ${old} pcs available`,'error');return;}
   const {error}=await sb.from('inventory').update({stock:newStock}).eq('id',item.id);
   if(error){showToast('Error: '+error.message,'error');return;}
   await logActivity(editMode==='add'?'update-add':'update-sub',item.typeName,item.size,qty,old,newStock);
-  await loadInventory(); renderStats(); renderTable(); updateAlertNav();
+  await loadInventory();renderStats();renderTable();updateAlertNav();
   closeModal('edit-modal');
   showToast(`Stock updated — ${item.typeName} ${item.size} (${old}→${newStock})`,'success');
 }
 
-// ─── MIN STOCK ───
+// ─── MIN STOCK / TYPES / USERS / LOG (unchanged) ───
 function renderMinList(){
   const el=document.getElementById('min-list');
   if(!allInventory.length){el.innerHTML='<div class="empty-state">No items</div>';return;}
@@ -900,30 +1591,27 @@ function renderMinList(){
       <input class="min-input" type="number" id="min-${item.id}" value="${item.min_stock}" min="0">
     </div>`).join('');
 }
-
 async function saveAllMin(){
   let updates=[];
   allInventory.forEach(item=>{
-    const el=document.getElementById('min-'+item.id); if(!el)return;
+    const el=document.getElementById('min-'+item.id);if(!el)return;
     const val=Math.max(0,parseInt(el.value)||0);
     if(val!==item.min_stock) updates.push({id:item.id,min_stock:val});
   });
   for(const u of updates) await sb.from('inventory').update({min_stock:u.min_stock}).eq('id',u.id);
-  await loadInventory(); renderStats(); renderTable(); updateAlertNav(); renderMinList();
-  showToast('Min stock limits saved','success');
+  await loadInventory();renderStats();renderTable();updateAlertNav();renderMinList();
+  showToast('Min stock saved','success');
 }
 
-// ─── PRODUCT TYPES ───
 async function addProductType(){
   const name=document.getElementById('new-type-name').value.trim();
   if(!name){showToast('Type name enter karo','error');return;}
   const {error}=await sb.from('product_types').insert({name});
   if(error){showToast(error.message.includes('unique')?'Already exists':'Error: '+error.message,'error');return;}
   document.getElementById('new-type-name').value='';
-  await loadTypes(); renderTypesListView();
-  showToast(`"${name}" add ho gaya`,'success');
+  await loadTypes();renderTypesListView();
+  showToast(`"${name}" added`,'success');
 }
-
 async function renderTypesListView(){
   await loadTypes();
   const el=document.getElementById('types-list');
@@ -938,7 +1626,6 @@ async function renderTypesListView(){
     </div>`;
   }).join('');
 }
-
 function startRenameType(id,old){
   const row=document.getElementById('type-row-'+id);
   row.innerHTML=`<input class="type-rename-input" id="rename-${id}" value="${old}">
@@ -948,34 +1635,30 @@ function startRenameType(id,old){
     </div>`;
   document.getElementById('rename-'+id).focus();
 }
-
 async function confirmRenameType(id,old){
   const newName=document.getElementById('rename-'+id).value.trim();
   if(!newName){showToast('Name empty nahi ho sakta','error');return;}
   const {error}=await sb.from('product_types').update({name:newName}).eq('id',id);
   if(error){showToast('Error: '+error.message,'error');return;}
-  await loadAll(); renderTypesListView();
-  showToast(`"${old}" renamed to "${newName}"`,'success');
+  await loadAll();renderTypesListView();
+  showToast(`"${old}" → "${newName}"`,'success');
 }
-
 function askDeleteType(name,id){
   deleteTypeName={name,id};
   const count=allInventory.filter(i=>i.product_type_id===id).length;
   document.getElementById('del-title').textContent=`"${name}" delete karo?`;
-  document.getElementById('del-warn').textContent=count>0?`Is type ke ${count} inventory item${count!==1?'s':''} bhi delete ho jayenge.`:'Is type ka koi inventory item nahi hai.';
+  document.getElementById('del-warn').textContent=count>0?`Is type ke ${count} items bhi delete ho jayenge.`:'Is type ka koi inventory item nahi hai.';
   document.getElementById('delete-modal').classList.add('open');
 }
-
 async function confirmDelete(){
   if(!deleteTypeName)return;
   const {error}=await sb.from('product_types').delete().eq('id',deleteTypeName.id);
   if(error){showToast('Error: '+error.message,'error');return;}
   showToast(`"${deleteTypeName.name}" deleted`,'success');
-  deleteTypeName=null; closeModal('delete-modal');
-  await loadAll(); renderTypesListView();
+  deleteTypeName=null;closeModal('delete-modal');
+  await loadAll();renderTypesListView();
 }
 
-// ─── USERS ───
 async function renderUsersView(){
   const {data}=await sb.from('profiles').select('*').order('created_at');
   const users=data||[];
@@ -991,53 +1674,53 @@ async function renderUsersView(){
     </tr>`).join('')}
   </tbody></table>`;
 }
-
 async function inviteUser(){
-  const email=document.getElementById('invite-email').value.trim();
+  const email=document.getElementById('invite-email').value.trim().toLowerCase();
   const role=document.getElementById('invite-role').value;
   if(!email){showToast('Email enter karo','error');return;}
-  // Store pending role for when user signs up
-  pendingInviteRole[email]=role;
-  // Use Supabase admin invite (requires service key) - so just show instruction
-  showToast(`User ko batao ke ${email} pe signup kare, phir aap unka role change kar dena`,'success');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Valid email daalo','error');return;}
+  showToast(`User ${email} ko bolo signup karein, phir unka role "${role}" change kar dena Users page se`,'success');
   document.getElementById('invite-email').value='';
 }
-
 function openRoleModal(userId,name,currentRole){
   roleChangeUserId=userId;
   document.getElementById('role-modal-sub').textContent=`${name} ka role change karo`;
   document.getElementById('role-select').value=currentRole;
   document.getElementById('role-modal').classList.add('open');
 }
-
 async function confirmRoleChange(){
   const newRole=document.getElementById('role-select').value;
   const {error}=await sb.from('profiles').update({role:newRole}).eq('id',roleChangeUserId);
   if(error){showToast('Error: '+error.message,'error');return;}
-  closeModal('role-modal'); renderUsersView();
+  closeModal('role-modal');renderUsersView();
   showToast('Role updated','success');
 }
 
-// ─── LOG ───
 async function logActivity(action,type,size,qty,prev,next){
   await sb.from('activity_log').insert({
-    user_id:currentUser.id,
-    user_email:currentUser.email,
+    user_id:currentUser.id,user_email:currentUser.email,
     action,product_type:type,size,quantity:qty,prev_stock:prev,new_stock:next
   });
 }
 
 async function renderLogView(){
-  const {data}=await sb.from('activity_log').select('*').order('created_at',{ascending:false}).limit(60);
+  const {data}=await sb.from('activity_log').select('*').order('created_at',{ascending:false}).limit(100);
   const logs=data||[];
   document.getElementById('log-count').textContent=`${logs.length} entries`;
-  if(!logs.length){document.getElementById('log-list').innerHTML='<div class="empty-state">No activity yet</div>';return;}
-  const map={add:['add','+ ADD'],print:['print','− PRINT'],'update-add':['update-add','↑ ADD'],'update-sub':['update-sub','↓ SUB']};
+  if(!logs.length){document.getElementById('log-list').innerHTML='<div class="empty-state">No activity</div>';return;}
+  const map={
+    'add':['add','+ ADD'],
+    'print':['print','− PRINT'],
+    'update-add':['update-add','↑ ADD'],
+    'update-sub':['update-sub','↓ SUB'],
+    'scan-add':['scan-add','⊕ SCAN+'],
+    'scan-sub':['scan-sub','⊖ SCAN−']
+  };
   document.getElementById('log-list').innerHTML=logs.map(l=>{
     const [cls,label]=map[l.action]||['add','—'];
     let detail='';
-    if(l.action==='add') detail=`<b>${l.product_type} · ${l.size}</b> — +${l.quantity} pcs`;
-    else if(l.action==='print') detail=`<b>${l.product_type} · ${l.size}</b> — −${l.quantity} pcs`;
+    if(l.action==='add'||l.action==='scan-add')detail=`<b>${l.product_type} · ${l.size}</b> — +${l.quantity} pcs`;
+    else if(l.action==='print'||l.action==='scan-sub')detail=`<b>${l.product_type} · ${l.size}</b> — −${l.quantity} pcs`;
     else detail=`<b>${l.product_type} · ${l.size}</b> — ${l.prev_stock} → ${l.new_stock}`;
     return `<div class="log-item">
       <span class="log-dot ${cls}"></span>
@@ -1053,34 +1736,37 @@ async function renderLogView(){
 const viewMeta={
   stock:{title:'Stock View',sub:'Saari inventory ek jagah'},
   alerts:{title:'Alerts',sub:'Low aur out of stock items'},
+  scanner:{title:'Scanner Mode',sub:'Barcode scan karke stock manage karo'},
+  workers:{title:'Worker Stats',sub:'Scan productivity aur leaderboard'},
+  barcodes:{title:'Barcodes',sub:'Har product-size ka unique barcode'},
   add:{title:'Stock Add',sub:'Naya stock entry karo'},
   print:{title:'Print Minus',sub:'Printed items stock se minus karo'},
   minstock:{title:'Min Stock',sub:'Minimum stock limits set karo'},
-  types:{title:'Manage Types',sub:'Product types add, rename, delete'},
-  users:{title:'Users',sub:'Team members aur roles manage karo'},
+  types:{title:'Manage Types',sub:'Product types manage karo'},
+  users:{title:'Users',sub:'Team members aur roles'},
   log:{title:'History',sub:'Saari activity ka record'},
 };
 
 function switchView(view){
   const role=currentProfile?.role||'viewer';
-  if(['add','print','minstock'].includes(view)&&!['admin','manager'].includes(role)){showToast('Access denied','error');return;}
-  if(['types','users'].includes(view)&&role!=='admin'){showToast('Sirf admin access kar sakta hai','error');return;}
+  if(['add','print','minstock','scanner','workers'].includes(view)&&!['admin','manager'].includes(role)){showToast('Access denied','error');return;}
+  if(['types','users','barcodes'].includes(view)&&role!=='admin'){showToast('Sirf admin access kar sakta hai','error');return;}
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('view-'+view).classList.add('active');
-  const navOrder=['stock','alerts','add','print','minstock','types','users','log'];
-  const allNavItems=document.querySelectorAll('.nav-item');
-  // find correct nav by onclick
-  allNavItems.forEach(n=>{if(n.getAttribute('onclick')===`switchView('${view}')`)n.classList.add('active');});
+  document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')===`switchView('${view}')`)n.classList.add('active');});
   document.getElementById('topbar-title').textContent=viewMeta[view].title;
   document.getElementById('topbar-sub').textContent=viewMeta[view].sub;
-  if(view==='alerts') renderAlertsView();
+  if(view==='alerts')renderAlertsView();
   if(view==='print'){refreshTypeDropdowns();renderBulkTable();}
-  if(view==='minstock') renderMinList();
-  if(view==='types') renderTypesListView();
-  if(view==='users') renderUsersView();
-  if(view==='log') renderLogView();
-  if(view==='add') refreshTypeDropdowns();
+  if(view==='minstock')renderMinList();
+  if(view==='types')renderTypesListView();
+  if(view==='users')renderUsersView();
+  if(view==='log')renderLogView();
+  if(view==='add')refreshTypeDropdowns();
+  if(view==='scanner'){setupScannerInput();renderScanBatch();focusScanner();}
+  if(view==='workers')renderWorkersView();
+  if(view==='barcodes')renderBarcodesView();
 }
 
 // ─── MODAL HELPERS ───
@@ -1089,11 +1775,18 @@ function closeModal(id){
   if(id==='edit-modal')editItemId=null;
   if(id==='delete-modal')deleteTypeName=null;
   if(id==='role-modal')roleChangeUserId=null;
+  // refocus scanner if scanner view
+  focusScanner();
 }
 document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);});});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('edit-modal');closeModal('delete-modal');closeModal('role-modal');}if(e.key==='Enter'&&editItemId)confirmEdit();});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal('edit-modal');closeModal('delete-modal');closeModal('role-modal');}
+  // Enter on modal — only fire confirmEdit if modal is open AND active element is the qty input
+  if(e.key==='Enter'&&editItemId&&document.getElementById('edit-modal').classList.contains('open')){
+    if(document.activeElement?.id==='modal-qty'){e.preventDefault();confirmEdit();}
+  }
+});
 
-// ─── TOAST ───
 function showToast(msg,type='success'){
   const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';
   setTimeout(()=>t.classList.remove('show'),3000);
