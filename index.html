@@ -255,6 +255,14 @@ tbody tr:last-child td{border-bottom:none;}
 <script>
 const SUPABASE_URL = 'https://swziotxspvfjfrsoqudv.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3emlvdHhzcHZmamZyc29xdWR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzk1MjYsImV4cCI6MjA5MTY1NTUyNn0.0yz3su9Emc-V7QBjB7YHkLXZ3l7lx2srWaH5gJWHjgI';
+  const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    storage: window.localStorage
+  }
+});
 </script>
 
 <!-- AUTH SCREEN -->
