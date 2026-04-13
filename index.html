@@ -592,9 +592,18 @@ async function doLogin() {
   if(!email||!pass){ showAuthErr('Email aur password dono fill karo'); return; }
   const btn=document.getElementById('login-btn');
   btn.disabled=true; btn.textContent='Logging in...';
-  const {error}=await sb.auth.signInWithPassword({email,password:pass});
-  btn.disabled=false; btn.textContent='Login';
-  if(error) showAuthErr(error.message);
+  try {
+    const result = await Promise.race([
+      sb.auth.signInWithPassword({email,password:pass}),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('Login timeout — dobara try karo')),10000))
+    ]);
+    if(result.error) showAuthErr(result.error.message);
+  } catch(e) {
+    showAuthErr(e.message);
+    try { Object.keys(localStorage).filter(k=>k.includes('auth-token')).forEach(k=>localStorage.removeItem(k)); } catch(_){}
+  } finally {
+    btn.disabled=false; btn.textContent='Login';
+  }
 }
 
 async function doSignup() {
