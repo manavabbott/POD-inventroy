@@ -255,14 +255,6 @@ tbody tr:last-child td{border-bottom:none;}
 <script>
 const SUPABASE_URL = 'https://swziotxspvfjfrsoqudv.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3emlvdHhzcHZmamZyc29xdWR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNzk1MjYsImV4cCI6MjA5MTY1NTUyNn0.0yz3su9Emc-V7QBjB7YHkLXZ3l7lx2srWaH5gJWHjgI';
-  const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    storage: window.localStorage
-  }
-});
 </script>
 
 <!-- AUTH SCREEN -->
@@ -568,6 +560,16 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
 <script>
 // ─── SUPABASE INIT ───
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    storageKey: 'pod-inventory-auth',
+    storage: window.localStorage,
+    detectSessionInUrl: false
+  }
+});
 
 // ─── STATE ───
 let currentUser = null;
@@ -632,28 +634,45 @@ async function doLogout() {
 }
 
 // ─── SESSION ───
-async function initSession(){
-  const {data:{session}}=await sb.auth.getSession();
-  if(session?.user){
-    currentUser=session.user;
-    await loadProfile();
-    initApp();
-  } else {
-    document.getElementById('auth-screen').style.display='';
-    document.getElementById('app-screen').style.display='none';
+let appInitialized = false;
+
+async function initSession() {
+  try {
+    const { data: { session }, error } = await sb.auth.getSession();
+    if(error) throw error;
+    if(session?.user) {
+      currentUser = session.user;
+      await loadProfile();
+      if(!appInitialized){ appInitialized=true; initApp(); }
+    } else {
+      showAuthScreen();
+    }
+  } catch(e) {
+    console.error('Session error:', e);
+    showAuthScreen();
   }
 }
 
-sb.auth.onAuthStateChange(async(event,session)=>{
-  if(event==='SIGNED_IN'&&!currentUser){
-    currentUser=session.user;
-    await loadProfile();
-    initApp();
+function showAuthScreen(){
+  document.getElementById('auth-screen').style.display='';
+  document.getElementById('app-screen').style.display='none';
+}
+
+sb.auth.onAuthStateChange(async(event, session)=>{
+  if(event === 'SIGNED_OUT'){
+    appInitialized = false;
+    currentUser = null;
+    currentProfile = null;
+    showAuthScreen();
+    return;
   }
-  if(event==='SIGNED_OUT'){
-    currentUser=null;
-    document.getElementById('auth-screen').style.display='';
-    document.getElementById('app-screen').style.display='none';
+  if((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user){
+    currentUser = session.user;
+    if(!appInitialized){
+      await loadProfile();
+      appInitialized = true;
+      initApp();
+    }
   }
 });
 
