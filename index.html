@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
 :root {
   --bg:#0f1117;--bg2:#161820;--bg3:#1e2029;--bg4:#252730;
@@ -376,6 +377,83 @@ tbody tr:last-child td{border-bottom:none;}
 .prodlist-print th,.prodlist-print td{border:1px solid #333;padding:8px 10px;text-align:left;color:#000;font-size:13px;}
 .prodlist-print th{background:#eee;}
 @media print { .prodlist-print-toolbar{display:none !important;} }
+
+/* CAMERA SCANNER */
+.cam-modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
+.cam-modal.open{display:flex;}
+.cam-box{background:var(--bg2);border-radius:var(--radius-lg);max-width:520px;width:100%;overflow:hidden;border:1px solid var(--border);}
+.cam-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.cam-hdr-title{font-size:14px;font-weight:600;}
+.cam-close{background:var(--bg3);border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;}
+#camera-reader{width:100%;background:#000;}
+#camera-reader video{width:100% !important;height:auto !important;display:block;}
+.cam-status{padding:10px 18px;border-top:1px solid var(--border);font-size:12px;color:var(--text3);display:flex;align-items:center;gap:10px;}
+.cam-status .scan-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.2s infinite;}
+.cam-flash{position:absolute;inset:0;background:rgba(61,214,140,0.4);opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.cam-flash.flash{opacity:1;transition:opacity 0.05s;}
+.cam-toolbar{padding:10px 18px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border);}
+.cam-btn-icon{padding:8px 12px !important;font-size:13px !important;}
+
+/* MOBILE MENU TOGGLE */
+.menu-toggle{display:none;background:var(--bg3);border:1px solid var(--border);color:var(--text);width:38px;height:38px;border-radius:8px;cursor:pointer;font-size:20px;align-items:center;justify-content:center;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9;}
+.sidebar-overlay.open{display:block;}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 900px) {
+  .menu-toggle{display:inline-flex;}
+  .sidebar{transform:translateX(-100%);transition:transform 0.25s ease;width:260px;z-index:11;}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .topbar{padding:0 14px;height:56px;}
+  .topbar-title{font-size:15px;}
+  .content{padding:14px;}
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .stat-card{padding:12px 14px;}
+  .stat-value{font-size:22px;}
+  .stat-icon{font-size:18px;top:12px;right:12px;}
+  .form-grid{grid-template-columns:1fr !important;gap:10px;}
+  .form-grid.g3,.form-grid.g5{grid-template-columns:1fr !important;}
+  .table-wrap{border-radius:var(--radius);}
+  .table-header{padding:10px 12px;gap:8px;}
+  .search-box input{width:100%;}
+  .search-box{margin-left:0;flex:1;min-width:140px;}
+  /* Horizontal scroll for tables */
+  #inv-table-wrap,#pieces-list,#log-list,#bulk-edit-tbody{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table{font-size:12px;min-width:560px;}
+  thead th,tbody td{padding:8px 10px;}
+  /* Scan view stack */
+  .scan-hero{padding:16px !important;}
+  .scan-hero-row{flex-direction:column;align-items:flex-start !important;gap:10px;}
+  .scan-hero-row > div:last-child{margin-left:0 !important;width:100%;}
+  .scan-toggle{width:100%;}
+  .scan-toggle button{flex:1;}
+  .scan-stats{grid-template-columns:repeat(3,1fr);gap:8px;}
+  .scan-stat{padding:10px;}
+  .scan-stat-value{font-size:18px;}
+  .scan-actions{flex-direction:column;align-items:stretch !important;}
+  .scan-actions .btn{width:100%;justify-content:center;}
+  .scan-actions label{margin-left:0 !important;justify-content:center;}
+  .view-scanner > div[style*='grid-template-columns']{grid-template-columns:1fr !important;}
+  .scan-input{font-size:16px !important;padding:14px 16px !important;}
+  /* Modals full screen on mobile */
+  .modal{max-width:100% !important;margin:8px;padding:18px !important;max-height:calc(100vh - 16px);overflow-y:auto;}
+  .modal-actions{flex-wrap:wrap;}
+  .modal-actions .btn{flex:1;}
+  /* Sidebar user section */
+  .user-info{font-size:12px;}
+  /* Pagination wrap */
+  #pc-pagination{flex-direction:column;align-items:stretch !important;gap:10px;}
+  /* Sticky process batch */
+  .scan-process-sticky{position:sticky;bottom:0;background:var(--bg);padding:10px;margin:0 -14px -14px;border-top:1px solid var(--border);z-index:4;display:flex;gap:8px;}
+  .scan-process-sticky .btn{flex:1;}
+}
+@media (max-width: 480px) {
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .scan-stats{grid-template-columns:1fr 1fr;}
+  .scan-stats .scan-stat:nth-child(3){grid-column:1/-1;}
+  .auth-card{padding:24px 22px;}
+}
 </style>
 </head>
 <body>
@@ -428,6 +506,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 <!-- APP SCREEN -->
 <div id="app-screen" style="display:none;">
   <div class="app-layout">
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar">
       <div class="sidebar-logo">
         <div class="logo-mark">
@@ -501,6 +580,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
     <main class="main">
       <div class="topbar">
+        <button class="menu-toggle" id="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">☰</button>
         <div>
           <div class="topbar-title" id="topbar-title">Dashboard</div>
           <div style="font-size:12px;color:var(--text3);" id="topbar-sub">Saari inventory ek jagah</div>
@@ -581,8 +661,11 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
             </div>
 
             <div class="scan-input-area">
-              <input type="text" id="scan-input" class="scan-input" placeholder="Scan barcode or type and press Enter..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input type="text" id="scan-input" class="scan-input" placeholder="Scan barcode or type and press Enter..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="padding-right:140px;">
               <div class="scan-input-hint"><span class="scan-dot"></span> <span id="scan-listening">Listening</span></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+              <button class="btn btn-secondary" onclick="openCameraScanner()" style="width:auto;">📷 Scan with Camera</button>
             </div>
 
             <div class="scan-stats">
@@ -946,6 +1029,32 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('delete-modal')">Cancel</button>
       <button class="btn btn-danger" onclick="confirmDelete()">Delete Karo</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAMERA SCANNER MODAL -->
+<div class="cam-modal" id="cam-modal">
+  <div class="cam-box">
+    <div class="cam-hdr">
+      <div>
+        <div class="cam-hdr-title">📷 Camera Scanner</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;" id="cam-mode-label">Mode: ADD</div>
+      </div>
+      <button class="cam-close" onclick="closeCameraScanner()">✕</button>
+    </div>
+    <div style="position:relative;">
+      <div id="camera-reader"></div>
+      <div class="cam-flash" id="cam-flash"></div>
+    </div>
+    <div class="cam-status">
+      <span class="scan-dot"></span>
+      <span id="cam-status-text">Camera ready — barcode point karo</span>
+      <span style="margin-left:auto;font-family:'DM Mono',monospace;font-weight:600;color:var(--green);">Scanned: <span id="cam-scanned-count">0</span></span>
+    </div>
+    <div class="cam-toolbar">
+      <button class="btn btn-ghost cam-btn-icon" onclick="switchCameraSide()">🔄 Switch Camera</button>
+      <button class="btn btn-success cam-btn-icon" style="margin-left:auto;width:auto;" onclick="processBatchFromCamera()">✓ Process Batch (<span id="cam-batch-count">0</span>)</button>
     </div>
   </div>
 </div>
@@ -1542,6 +1651,7 @@ function flashInput(type){
 
 function renderScanBatch(){
   document.getElementById('scan-total').textContent=scanBatch.scans.length;
+  const camBC=document.getElementById('cam-batch-count');if(camBC)camBC.textContent=scanBatch.scans.length;
   const byItem={};
   scanBatch.scans.forEach(s=>{
     const k=s.item.id;
@@ -1715,11 +1825,137 @@ function setupScannerInput(){
     setTimeout(()=>{
       if(!document.getElementById('view-scanner')?.classList.contains('active'))return;
       if(document.querySelector('.modal-overlay.open'))return;
+      if(document.getElementById('cam-modal')?.classList.contains('open'))return;
       const ae=document.activeElement;
       if(ae&&ae!==document.body&&['INPUT','TEXTAREA','SELECT','BUTTON'].includes(ae.tagName))return;
       input.focus();
     },150);
   });
+}
+
+// ─── MOBILE SIDEBAR TOGGLE ───
+function toggleSidebar(){
+  const sb=document.querySelector('.sidebar');
+  const ov=document.getElementById('sidebar-overlay');
+  if(!sb)return;
+  const open=sb.classList.toggle('open');
+  if(ov)ov.classList.toggle('open',open);
+}
+function closeSidebarOnMobile(){
+  if(window.innerWidth<=900){
+    document.querySelector('.sidebar')?.classList.remove('open');
+    document.getElementById('sidebar-overlay')?.classList.remove('open');
+  }
+}
+
+// ─── CAMERA SCANNER ───
+let camScanner=null;
+let camCameraId=null;
+let camCameras=[];
+let camCameraIndex=0;
+let camLastScan={code:'',ts:0};
+let camScannedCount=0;
+
+async function openCameraScanner(){
+  const modal=document.getElementById('cam-modal');
+  modal.classList.add('open');
+  document.getElementById('cam-mode-label').textContent='Mode: '+(scanBatch.mode==='add'?'ADD (Inward)':'MINUS (Print)');
+  camScannedCount=0;
+  document.getElementById('cam-scanned-count').textContent='0';
+  updateCamBatchCount();
+  if(typeof Html5Qrcode==='undefined'){
+    document.getElementById('cam-status-text').textContent='Camera library load nahi hui — internet check karo';
+    return;
+  }
+  try {
+    if(!camCameras.length){
+      camCameras=await Html5Qrcode.getCameras();
+    }
+    if(!camCameras.length){
+      document.getElementById('cam-status-text').textContent='Koi camera nahi mila';
+      return;
+    }
+    // Prefer back camera
+    const back=camCameras.findIndex(c=>/back|rear|environment/i.test(c.label));
+    camCameraIndex=back>=0?back:0;
+    await startCameraScan();
+  } catch(err){
+    document.getElementById('cam-status-text').textContent='Camera permission denied: '+err.message;
+  }
+}
+
+async function startCameraScan(){
+  if(camScanner){try{await camScanner.stop();}catch(e){}camScanner=null;}
+  const reader=document.getElementById('camera-reader');
+  reader.innerHTML='';
+  camScanner=new Html5Qrcode('camera-reader',{verbose:false});
+  const cam=camCameras[camCameraIndex];
+  camCameraId=cam.id;
+  const config={
+    fps:10,
+    qrbox:{width:280,height:140},
+    aspectRatio:1.6,
+    formatsToSupport:[
+      Html5QrcodeSupportedFormats?.CODE_128,
+      Html5QrcodeSupportedFormats?.CODE_39,
+      Html5QrcodeSupportedFormats?.EAN_13,
+      Html5QrcodeSupportedFormats?.EAN_8,
+      Html5QrcodeSupportedFormats?.UPC_A,
+      Html5QrcodeSupportedFormats?.QR_CODE
+    ].filter(x=>x!==undefined)
+  };
+  try {
+    await camScanner.start(camCameraId,config,onCameraScanSuccess,()=>{});
+    document.getElementById('cam-status-text').textContent='Live — barcode point karo';
+  } catch(err){
+    document.getElementById('cam-status-text').textContent='Start fail: '+err.message;
+  }
+}
+
+function onCameraScanSuccess(decodedText){
+  if(!decodedText)return;
+  const code=decodedText.trim();
+  const now=Date.now();
+  // Debounce: same code within 1.5s = ignore
+  if(camLastScan.code===code && (now-camLastScan.ts)<1500)return;
+  camLastScan={code,ts:now};
+  // Flash visual
+  const flash=document.getElementById('cam-flash');
+  if(flash){flash.classList.add('flash');setTimeout(()=>flash.classList.remove('flash'),200);}
+  // Process scan via existing pipeline (stays in ADD or SUB mode as set)
+  handleScanInput(code);
+  camScannedCount++;
+  document.getElementById('cam-scanned-count').textContent=camScannedCount;
+  document.getElementById('cam-status-text').textContent='✓ Scanned: '+code.slice(0,30);
+  updateCamBatchCount();
+}
+
+function updateCamBatchCount(){
+  const el=document.getElementById('cam-batch-count');
+  if(el)el.textContent=scanBatch.scans.length;
+}
+
+async function switchCameraSide(){
+  if(camCameras.length<2){showToast('Sirf ek camera available hai','error');return;}
+  camCameraIndex=(camCameraIndex+1)%camCameras.length;
+  await startCameraScan();
+}
+
+async function processBatchFromCamera(){
+  await processScanBatch();
+  updateCamBatchCount();
+  camScannedCount=0;
+  document.getElementById('cam-scanned-count').textContent='0';
+  document.getElementById('cam-status-text').textContent='Batch processed — agle scan ke liye ready';
+}
+
+async function closeCameraScanner(){
+  if(camScanner){
+    try{await camScanner.stop();}catch(e){}
+    try{camScanner.clear();}catch(e){}
+    camScanner=null;
+  }
+  document.getElementById('cam-modal').classList.remove('open');
 }
 
 // ─── WORKER STATS ───
@@ -2860,6 +3096,7 @@ function switchView(view){
   if(view==='workers')renderWorkersView();
   if(view==='genpieces'){refreshGenDropdowns();updateGenSample();}
   if(view==='pieces'){refreshPieceFilterDropdowns();renderPiecesView();}
+  closeSidebarOnMobile();
 }
 
 // ─── MODAL HELPERS ───
@@ -2872,7 +3109,7 @@ function closeModal(id){
 }
 document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);});});
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal('edit-modal');closeModal('delete-modal');closeModal('role-modal');closeModal('bulk-edit-modal');}
+  if(e.key==='Escape'){closeModal('edit-modal');closeModal('delete-modal');closeModal('role-modal');closeModal('bulk-edit-modal');if(document.getElementById('cam-modal')?.classList.contains('open'))closeCameraScanner();}
   if(e.key==='Enter'&&editItemId&&document.getElementById('edit-modal').classList.contains('open')){
     if(document.activeElement?.id==='modal-qty'){e.preventDefault();confirmEdit();}
   }
