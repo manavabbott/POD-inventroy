@@ -626,6 +626,7 @@ async function doLogout() {
 }
 
 // ─── SESSION ───
+await sb.auth.getSession();
 sb.auth.onAuthStateChange(async(event,session)=>{
   if(session?.user){
     currentUser=session.user;
