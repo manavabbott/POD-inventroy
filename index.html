@@ -632,7 +632,8 @@ async function doLogout() {
 }
 
 // ─── SESSION ───
-sb.auth.onAuthStateChange(async(event,session)=>{
+async function initSession(){
+  const {data:{session}}=await sb.auth.getSession();
   if(session?.user){
     currentUser=session.user;
     await loadProfile();
@@ -641,7 +642,22 @@ sb.auth.onAuthStateChange(async(event,session)=>{
     document.getElementById('auth-screen').style.display='';
     document.getElementById('app-screen').style.display='none';
   }
+}
+
+sb.auth.onAuthStateChange(async(event,session)=>{
+  if(event==='SIGNED_IN'&&!currentUser){
+    currentUser=session.user;
+    await loadProfile();
+    initApp();
+  }
+  if(event==='SIGNED_OUT'){
+    currentUser=null;
+    document.getElementById('auth-screen').style.display='';
+    document.getElementById('app-screen').style.display='none';
+  }
 });
+
+initSession();
 
 async function loadProfile() {
   // Retry up to 5 times to handle timing issues
